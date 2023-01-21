@@ -1,6 +1,7 @@
 @import url(react-big-calendar/lib/css/react-big-calendar.css);
 @import url(react-big-calendar/lib/addons/dragAndDrop/styles.css);
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,700&display=swap");
+@import url("https://use.typekit.net/eks2qsg.css");
 
 * {
   font-family: "Roboto", sans-serif;
@@ -16,6 +17,9 @@
   --grey-border: #34495e;
   --side-nav-bar-bg-color: #ffffff;
   --my-calendar-bg-color: #fbfbfb;
+  --normal-nav-text-color: #858686;
+  --active-nav-text-color: #20e29f;
+  --active-nav-bg-color: #f5f5f5;
 }
 
 body {
@@ -25,7 +29,6 @@ body {
 /* app  */
 .app {
   width: 100%;
-  height: 100vh;
   display: flex;
   justify-content: space-between;
 }
@@ -40,66 +43,113 @@ body {
 
 /* sice nav bar  */
 .side-nav-bar {
-  padding: 0 !important;
+  padding: 0;
   background-color: var(--side-nav-bar-bg-color);
-  margin: 0 !important;
   position: relative;
   box-shadow: 6px 0px 12px #e7e7e7;
   z-index: 3;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  transition: all 0.2s ease-in-out;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.headerBottom-content__container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 20px;
+}
+.image-headerBottom__container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding-left: 20px;
+  border-bottom: 1px solid var(--normal-nav-text-color);
+  padding-bottom: 20px;
+}
+.image-headerBottom__container img {
+  background-color: var(--active-nav-text-color);
+  border-radius: 50%;
+  cursor: pointer;
+  width: 30px;
+}
+
+.logo__sideBar img {
+  margin: 27px 20px 30px 20px;
+}
+
+.logo-with-hover {
+  max-width: 200px;
+}
+.logo-without-hover {
+  max-width: 35px;
 }
 
 .side-nav-bar ul {
-  list-style: none;
-  padding: 0;
-  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   position: relative;
-  margin-right: 4px;
+  padding: 0px;
 }
 .side-nav-bar ul li {
-  padding: 20px;
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  margin-bottom: 25px;
 }
 
-.side-nav-bar ul li button {
-  background-color: transparent;
-  transition: background-color 0.1s;
-  background-color: var(--theme-color);
-  color: white;
-  border: none;
+.side-nav-bar ul li a {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-decoration: none;
+  padding-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  position: relative;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+
+.active-link::before {
+  content: "";
+  width: 4px;
+  background-color: var(--active-nav-text-color);
+  position: absolute;
+  left: 0;
+  height: 100%;
+}
+
+.showArrow::after {
+  content: ">";
+  position: absolute;
+  right: 15px;
+  font-size: 25px;
+  color: inherit;
+}
+
+.active-link {
+  position: relative;
+}
+
+.side-nav-bar ul li a img {
   width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  box-sizing: unset;
-  padding: 4px;
-  box-shadow: 2px 2px 12px #e6e6e6, -2px -2px 12px #ffffff;
-
-  position: relative;
-}
-.side-nav-bar ul li button {
-  outline: none !important;
-}
-.side-nav-bar ul li button span .fi {
-  font-size: 14px !important;
-  position: relative;
-  bottom: -2px;
+  mix-blend-mode: darken;
 }
 
-.side-nav-bar ul li:first-child {
-  position: absolute;
-  top: 10px;
-}
-.side-nav-bar ul li:last-child {
-  position: absolute;
-  bottom: 10px;
-}
-.side-nav-bar ul li:first-child button,
-.side-nav-bar ul li:last-child button {
-  border-radius: 20%;
-  color: black;
-  background-color: transparent;
+.side-nav-bar ul li a p {
+  margin-bottom: 0;
+  margin-left: 15px;
+  font-size: 15px;
 }
 
 /* mycalendar */
@@ -110,6 +160,7 @@ body {
   padding-top: 20px;
   background-color: var(--my-calendar-bg-color);
   margin-right: 3px;
+  padding-left: 30px;
 }
 
 /* event color */
@@ -216,4 +267,150 @@ body {
 }
 .rbc-agenda-view table.rbc-agenda-table {
   border: none !important;
+}
+
+/* client page styles  */
+.clientPage {
+  background-color: var(--my-calendar-bg-color);
+  width: 100%;
+  padding: 30px 0px 30px 30px;
+}
+
+.header__clientPage {
+  background-color: #fff;
+  box-shadow: 6px 0px 12px #e7e7e7;
+  margin: 0 30px 10px 0;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 20px;
+}
+.header__clientPage p {
+  font-size: 30px;
+  margin-bottom: 0;
+  font-weight: 600;
+  font-family: "sofia-pro", sans-serif;
+  padding-bottom: 4px;
+}
+.rightPart-header__clientPage {
+  display: flex;
+}
+.btnGroup-header__clientPage {
+  margin-right: 20px;
+  background-color: #d8d2d1;
+  border-radius: 20px;
+}
+.btnGroup-header__clientPage button,
+.btn-newClient-header__clientPage {
+  font-size: 12px;
+  padding: 5px 15px;
+  border-radius: 20px;
+  background-color: #d8d2d1;
+  border: none;
+  color: #fff;
+}
+.btn-newClient-header__clientPage {
+  background-color: var(--active-nav-text-color);
+  font-weight: 600;
+}
+.btn-newClient-header__clientPage img {
+  width: 17px;
+  margin-right: 5px;
+}
+.refreshIcon-header__clientPage {
+  margin-left: 20px;
+  background-color: var(--active-nav-bg-color);
+  border-radius: 50%;
+  padding: 0px 6px;
+  cursor: pointer;
+}
+.refreshIcon-header__clientPage img {
+  transform: rotate(268deg);
+  width: 17px;
+  transition: all 0.3s;
+}
+.detailsContainer__clientPage {
+  display: flex;
+  margin-right: 30px;
+  height: 80vh;
+}
+.commonContainer-detailsContainer__clientPage {
+  background-color: #fff;
+  box-shadow: 6px 0px 12px #e7e7e7;
+  padding: 10px 20px;
+  border-radius: 20px;
+  width: 50%;
+}
+.retainerBased-detailsContainer__clientPage {
+  margin-left: 8px;
+}
+.projectBased-detailsContainer__clientPage {
+  margin-right: 8px;
+}
+.commonContainer-detailsContainer__clientPage p {
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 0;
+  font-family: "sofia-pro", sans-serif;
+  margin-bottom: 5px;
+}
+.searchContainer-detailsContainer__clientPage {
+  background-color: #ededed;
+  border-radius: 20px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  margin-top: 5px;
+}
+.searchContainer-detailsContainer__clientPage img {
+  width: 17px;
+  margin-right: 5px;
+}
+.searchContainer-detailsContainer__clientPage input {
+  width: 92%;
+  font-size: 14px;
+  background-color: #ededed;
+  border: none;
+  outline: none;
+}
+.dataContainer-detailsContainer__clientPage {
+  overflow-y: scroll;
+  height: 85%;
+  margin-top: 10px;
+}
+.dataContainer-detailsContainer__clientPage::-webkit-scrollbar {
+  width: 12px;
+  background-color: #ededed;
+  border-radius: 10px;
+}
+.dataContainer-detailsContainer__clientPage::-webkit-scrollbar-thumb {
+  background-color: var(--active-nav-text-color);
+}
+.data-detailsContainer__clientPage {
+  display: flex;
+  align-items: center;
+  padding: 7px 0px;
+  border-bottom: 1px solid #b0a4a4;
+  position: relative;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.data-detailsContainer__clientPage::after {
+  content: ">";
+  position: absolute;
+  font-size: 18px;
+  right: 0px;
+  top: 9px;
+}
+.data-detailsContainer__clientPage img {
+  max-width: 30px;
+}
+.data-detailsContainer__clientPage p {
+  margin-bottom: 0;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  margin-left: 8px;
 }

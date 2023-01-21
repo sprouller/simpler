@@ -7,6 +7,7 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
+import { fetchClients } from "../controller/Airtable";
 
 function EditModal({
   modalState,
@@ -25,6 +26,7 @@ function EditModal({
   const [description, setDescription] = useState("");
   const [thirdPartyItem, setThirdPartyItem] = useState("");
   const [thirdPartyCost, setThirdPartyCost] = useState(0);
+  const [allClient, setAllClient] = useState([]);
 
   useEffect(() => {
     if (!sprint) return;
@@ -34,14 +36,19 @@ function EditModal({
     setClientId(sprint.job.client.id);
     setTimeAllocated(sprint.job.timeAllocated);
     setEmployeeId(sprint.employee.id);
+    setAllClient(getClientsDetails());
   }, [sprint]);
 
+  const getClientsDetails = async () => {
+    let existedClient = await fetchClients();
+  };
+
   const getStartDateText = () => {
-    return moment.utc(sprint.start).format("MM/DD/YYYY");
+    return moment.utc(sprint.start).format("DD/MM/YYYY");
   };
 
   const getEndDateText = () => {
-    return moment.utc(sprint.end).format("MM/DD/YYYY");
+    return moment.utc(sprint.end).format("DD/MM/YYYY");
   };
 
   console.log({ clients });
@@ -56,7 +63,6 @@ function EditModal({
   }
 
   console.log({ end });
-
   return (
     <>
       <Modal

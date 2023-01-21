@@ -7,6 +7,7 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
+import { fetchClients } from "../controller/Airtable";
 
 function AddEventModal({
   addEventModalStatus,
@@ -18,6 +19,7 @@ function AddEventModal({
   handleClose,
   handleSave,
   handleScheduleJob,
+  sprint,
 }) {
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
@@ -28,23 +30,31 @@ function AddEventModal({
   const [description, setDescription] = useState("");
   const [thirdPartyItem, setThirdPartyItem] = useState("");
   const [thirdPartyCost, setThirdPartyCost] = useState(0);
-
+  const [jobCode, setJobCode] = useState("");
+  const [counter, setCounter] = useState(1);
+  const [subBrand, setSubBrands] = useState("");
   useEffect(() => {
     setStart(getStartDateText());
     setEnd(getEndDateText());
+    clientId && setJobCode();
   }, [startDate, endDate]);
 
-  //   console.log({ startDate });
-  //   console.log({ start });
+  console.log({ startDate });
+  console.log({ start });
 
-  const getStartDateText = () => {
-    return moment.utc(startDate).format("MM/DD/YYYY");
+  const getStartDateText = (e) => {
+    if (e) {
+      return moment.utc(e).format("DD/MM/YY");
+    }
+    return moment.utc(startDate).format("DD/MM/YY");
   };
 
-  const getEndDateText = () => {
-    return moment.utc(endDate).format("MM/DD/YYYY");
+  const getEndDateText = (e) => {
+    if (e) {
+      return moment.utc(e).format("DD/MM/YY");
+    }
+    return moment.utc(endDate).format("DD/MM/YY");
   };
-
   //   const convertDateForAirtable = (dateStrDDMMYYYY) => {
   //     var dateParts = dateStrDDMMYYYY.split("/");
   //     // month is 0-based, that's why we need dataParts[1] - 1
@@ -52,6 +62,43 @@ function AddEventModal({
   //     return dateObject;
   //   };
 
+  //   let clientName = clients.filter((clientObj, index) => {
+  //     clientObj.id === clientId;
+  //   });
+  //
+  const createJobCode = (_id) => {
+    let newFilteredArr = sprint
+      ?.filter((allData) => {
+        return allData?.job?.client?.id === _id;
+      })
+      .map((newData) => {
+        return newData;
+      });
+
+    if (newFilteredArr?.length > 0) {
+      newFilteredArr?.forEach((data) => {
+        let clientName = data?.job?.client?.name
+          ?.substring(0, 3)
+          ?.toUpperCase();
+        if (newFilteredArr?.length < 9) {
+          setJobCode(`${clientName}00${newFilteredArr?.length + 1}`);
+        } else if (newFilteredArr?.length < 99) {
+          setJobCode(`${clientName}0${newFilteredArr?.length + 1}`);
+        } else {
+          setJobCode(`${clientName}${newFilteredArr?.length + 1}`);
+        }
+      });
+    } else {
+      clients?.forEach((eachClient) => {
+        if (eachClient?.id === _id) {
+          let generateCode = `${eachClient?.name
+            ?.substring(0, 3)
+            ?.toUpperCase()}001`;
+          setJobCode(generateCode);
+        }
+      });
+    }
+  };
   addEventModalStatus && console.log("render");
   return (
     <>
@@ -74,6 +121,7 @@ function AddEventModal({
                     required
                     onChange={(e) => {
                       setClientId(e.target.value);
+                      createJobCode(e.target.value);
                     }}
                     aria-label="Assign to Client"
                   >
@@ -93,20 +141,24 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="subBrandInputAdd">
                   <Form.Label>Sub Brand</Form.Label>
                   <Form.Select
-                    disabled
+                    value={subBrand}
                     onChange={(e) => {
-                      //   setClient(e.target.value);
+                      setSubBrands(e.target.value);
                     }}
                     aria-label="Assign to Sub Brand"
                   >
-                    <option>Assign to Sub Brand</option>
-                    {clients &&
-                      clients.map((client) => {
-                        return (
-                          <option key={client.id} value={client.id}>
-                            {client.name}
-                          </option>
-                        );
+                    <option>Assign to Sub Brand</option>;
+                    {clientId &&
+                      clients.map((clientData) => {
+                        if (clientData.id === clientId) {
+                          return clientData.subbrand.map((subData, index) => {
+                            return (
+                              <option key={index} value={subData}>
+                                {subData}
+                              </option>
+                            );
+                          });
+                        }
                       })}
                   </Form.Select>
                 </Form.Group>
@@ -120,7 +172,8 @@ function AddEventModal({
                     type="text"
                     onFocus={(e) => (e.target.type = "date")}
                     onChange={(e) => {
-                      setStart(e.target.value);
+                      let newStartDate = getStartDateText(e.target.value);
+                      setStart(newStartDate);
                     }}
                     defaultValue={getStartDateText()}
                     placeholder={getStartDateText()}
@@ -132,7 +185,10 @@ function AddEventModal({
                   <Form.Label>End Date</Form.Label>
                   <Form.Control
                     type="text"
-                    onChange={(e) => setEnd(e.target.value)}
+                    onChange={(e) => {
+                      let newEndDate = getStartDateText(e.target.value);
+                      setEnd(newEndDate);
+                    }}
                     onFocus={(e) => (e.target.type = "date")}
                     defaultValue={getEndDateText()}
                     placeholder={getEndDateText()}
@@ -145,10 +201,9 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="jobCodeInputAdd">
                   <Form.Label>Job Code</Form.Label>
                   <Form.Control
-                    disabled
                     type="text"
-                    onChange={(e) => setJobName(e.target.value)}
-                    defaultValue={""}
+                    value={jobCode}
+                    onChange={(e) => setJobCode(e.target.value)}
                     placeholder={"DIAXXXX"}
                   />
                 </Form.Group>
@@ -208,7 +263,6 @@ function AddEventModal({
               <Form.Group className="mb-3" controlId="descriptionInputAdd">
                 <Form.Label>Description</Form.Label>
                 <Form.Control
-                  disabled
                   type="text"
                   as="textarea"
                   style={{ height: "100px" }}
@@ -223,7 +277,6 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="thirdPartyItemInputAdd">
                   <Form.Label>Third Party Item</Form.Label>
                   <Form.Control
-                    disabled
                     type="text"
                     onChange={(e) => setThirdPartyItem(e.target.value)}
                     defaultValue={""}
@@ -235,7 +288,6 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="thirdPartyCost">
                   <Form.Label>Cost £</Form.Label>
                   <Form.Control
-                    disabled
                     type="number"
                     onChange={(e) => setThirdPartyCost(e.target.value)}
                     defaultValue={""}
@@ -253,14 +305,22 @@ function AddEventModal({
             variant="success"
             onClick={() => {
               const sprint = {
-                start,
-                end,
+                start: moment(
+                  `${start.replace("/", "").trim()}`,
+                  "DDMMYY"
+                ).format("yyyy[-]MM[-]DD"),
+                end: moment(`${end.replace("/", "").trim()}`, "DDMMYY").format(
+                  "yyyy[-]MM[-]DD"
+                ),
                 employeeId,
               };
               const job = {
                 jobName,
                 clientId,
                 timeAllocated: parseInt(timeAllocated, 10),
+                jobCode,
+                description,
+                subBrand,
               };
               handleScheduleJob(job, sprint);
               setStart("");
@@ -268,6 +328,7 @@ function AddEventModal({
               setJobName("");
               setTimeAllocated(0);
               setDescription("");
+              setJobCode("");
             }}
           >
             Add Job

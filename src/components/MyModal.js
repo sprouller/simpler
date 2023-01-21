@@ -39,18 +39,25 @@ function MyModal({
     setEnd(getEndDateText());
   }, [startDate, endDate]);
 
-  const getStartDateText = () => {
-    return moment.utc(startDate).format("DD/MM/YYYY");
+  const getStartDateText = (e) => {
+    if (e) {
+      return moment.utc(e).format("DD/MM/YY");
+    }
+    return moment.utc(startDate).format("DD/MM/YY");
   };
 
-  const getEndDateText = () => {
-    return moment.utc(endDate).format("DD/MM/YYYY");
+  const getEndDateText = (e) => {
+    if (e) {
+      return moment.utc(e).format("DD/MM/YY");
+    }
+    return moment.utc(endDate).format("DD/MM/YY");
   };
 
   const convertDateForAirtable = (dateStrDDMMYYYY) => {
     var dateParts = dateStrDDMMYYYY.split("/");
     // month is 0-based, that's why we need dataParts[1] - 1
     var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+
     return dateObject;
   };
 
@@ -75,7 +82,8 @@ function MyModal({
                 type="text"
                 onFocus={(e) => (e.target.type = "date")}
                 onChange={(e) => {
-                  setStart(e.target.value);
+                  let newStartDate = getStartDateText(e.target.value);
+                  setStart(newStartDate);
                 }}
                 defaultValue={getStartDateText()}
                 placeholder={getStartDateText()}
@@ -87,7 +95,10 @@ function MyModal({
               <Form.Label>End Date</Form.Label>
               <Form.Control
                 type="text"
-                onChange={(e) => setEnd(e.target.value)}
+                onChange={(e) => {
+                  let newEndDate = getStartDateText(e.target.value);
+                  setEnd(newEndDate);
+                }}
                 onFocus={(e) => (e.target.type = "date")}
                 defaultValue={getEndDateText()}
                 placeholder={getEndDateText()}

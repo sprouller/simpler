@@ -1,7 +1,7 @@
 import Airtable from "airtable";
 
 var base = new Airtable({ apiKey: process.env.REACT_APP_API_KEY }).base(
-  "appZSbj9h1nqMu4gX"
+  "app4MuI5YyGmbvfrP"
 );
 
 export async function fetchSprints() {
@@ -11,9 +11,7 @@ export async function fetchSprints() {
       view: "Grid view",
     })
     .all();
-  console.log("airtable");
-  console.log({ sprints });
-  return sprints.map((sprint) => {
+  return sprints?.map((sprint) => {
     let s = sprint.get("start_date");
     let ds = new Date(s);
     let e = sprint.get("end_date");
@@ -43,6 +41,16 @@ export async function fetchSprints() {
           id: sprint.get("Clients (from Jobs)")[0],
           name: sprint.get("name (from Clients) (from Jobs)")[0],
         },
+        job_code:
+          sprint.get("job_code (from Jobs)") !== undefined
+            ? sprint.get("job_code (from Jobs)")[0]
+            : "",
+        description:
+          sprint.get("description (from Jobs)") !== undefined &&
+          sprint.get("description (from Jobs)")[0],
+        subBrand:
+          sprint.get("subBrand (from Jobs)") !== undefined &&
+          sprint.get("subBrand (from Jobs)")[0],
       },
     };
     sprintObj.title = `Client: ${sprintObj.job.client.name} | Job: ${sprintObj.job.name} | ${sprintObj.employee.firstName}`;
@@ -70,6 +78,7 @@ export async function fetchClients() {
     return {
       id: client.get("id"),
       name: client.get("name"),
+      subbrand: client.get("subbrand"),
     };
   });
 }
@@ -99,7 +108,8 @@ export async function fetchWorkItemsByJobId(jobId) {
 }
 
 export async function addJobAndSprintToAirtable(job, sprint) {
-  let { jobName, clientId, timeAllocated } = job;
+  let { jobName, clientId, timeAllocated, jobCode, description, subBrand } =
+    job;
   let { employeeId, start, end } = sprint;
   try {
     let returnedJobRecord = await base(
@@ -109,6 +119,9 @@ export async function addJobAndSprintToAirtable(job, sprint) {
       time_allocated: timeAllocated,
       status: "Closed",
       Clients: [clientId],
+      job_code: jobCode,
+      description: description,
+      subBrand,
     });
     let jobId = returnedJobRecord.getId();
     console.log(`job ${jobId} added to Airtable. Adding sprint now...`);

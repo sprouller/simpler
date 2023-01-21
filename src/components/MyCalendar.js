@@ -52,8 +52,8 @@ const BasicCalendar = () => {
   }, []);
 
   console.log({ sprints });
-  // console.log({ employees });
-  // console.log({ clients });
+  console.log({ employees });
+  console.log({ clients });
 
   // Attach event listeners to the window object to listen for keydown and keyup events
   window.addEventListener("keydown", handleKeyDown);
@@ -91,8 +91,6 @@ const BasicCalendar = () => {
   };
 
   const handleEditSprintAndJob = async (sprintData, jobData) => {
-    console.log("handleEditSprintAndJob");
-    console.log({ sprintData, jobData });
     await editSprintInTable(sprintData);
     await editJobInTable(jobData);
     fetchSprints().then((sprintsFromAirtable) => {
@@ -126,19 +124,27 @@ const BasicCalendar = () => {
 
   // handles when a day is clicked (without event)
   const handleSlotSelectEvent = (slotInfo) => {
-    setStartDate(new Date(`${slotInfo.start}`));
-    setEndDate(new Date(`${slotInfo.end}`));
+    // setStartDate(new Date(slotInfo.start));
+    // setEndDate(new Date(slotInfo.end - 1));
+    let dragStartDate = new Date(slotInfo?.start);
+    let microSecondDate = new Date(Date.parse(slotInfo?.end));
+    microSecondDate = microSecondDate.setDate(microSecondDate.getDate() - 1);
+    let dragEndDate = new Date(microSecondDate);
+    setStartDate(dragStartDate);
+    setEndDate(dragEndDate);
     setModalState("add-modal");
   };
 
   //move event handler
   const moveEventHandler = async ({ event: sprint, start, end }) => {
     // let sprint = event;
+
     let sprintId = sprint.id;
     console.log({ sprint });
     let endDate = new Date(end);
     let minusOneEnd = new Date(end);
     minusOneEnd.setDate(endDate.getDate() - 1);
+    // minusOneEnd.setDate(endDate.getDate() - 1);
     let sprintData = {
       sprintId,
       start_date: start,
@@ -206,7 +212,8 @@ const BasicCalendar = () => {
       <DnDCalendar
         localizer={localizer}
         events={sprints}
-        views={["month"]}
+        views={["month", "week"]}
+        defaultView={"month"}
         startAccessor={(e) => {
           let startDate = new Date(e.start);
           return startDate;
@@ -218,6 +225,7 @@ const BasicCalendar = () => {
         }}
         endAccessor={(e) => {
           let addOneDay = new Date(e.end);
+          // addOneDay.setDate(addOneDay.getDate() - 1);
           addOneDay.setDate(addOneDay.getDate() + 1);
           return addOneDay;
           //return endDate;
@@ -245,6 +253,7 @@ const BasicCalendar = () => {
         employees={employees}
         handleClose={handleClose}
         handleScheduleJob={handleScheduleJob}
+        sprint={sprints}
       />
       <ViewSprintModal
         modalState={modalState}

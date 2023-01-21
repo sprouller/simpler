@@ -5,6 +5,8 @@ import "./Responsive.css";
 
 import MyCalendar from "./components/MyCalendar";
 import SideNavBar from "./components/SideNavBar";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ClientPage from "./components/ClientPage";
 
 function App() {
   //set theme by navbar and reflect it in app style
@@ -30,10 +32,19 @@ function App() {
   };
 
   return (
-    <div className="app" style={myStyle}>
-      <SideNavBar toggleStyle={toggleStyle} />
-      <MyCalendar className="p-4" style={myStyle} />
-    </div>
+    <BrowserRouter>
+      <div className="app" style={myStyle}>
+        <SideNavBar toggleStyle={toggleStyle} />
+        <Routes>
+          <Route
+            path="/"
+            element={<MyCalendar className="p-4" style={myStyle} />}
+          />
+
+          <Route path="/client" element={<ClientPage />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

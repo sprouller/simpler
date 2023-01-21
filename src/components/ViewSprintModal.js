@@ -44,7 +44,7 @@ function ViewSprintModal({
   }, [sprint]);
 
   const getUTCDate = (date) => {
-    return moment.utc(date).format("MM/DD/YYYY");
+    return moment.utc(date).format("DD/MM/YYYY");
   };
 
   if (!sprint) {
@@ -55,7 +55,7 @@ function ViewSprintModal({
       </>
     );
   }
-
+  console.log("All the data are......", sprint);
   const handleAddWorkItem = async (sprintId, date, hours) => {
     console.log("handleAddWorkItem");
     console.log({ sprintId, date, hours });
@@ -107,7 +107,7 @@ function ViewSprintModal({
                 <Col>
                   <Stack direction="horizontal" gap={2}>
                     <strong>Job Code:</strong>
-                    <div>{"DIAXXXX"}</div>
+                    <div>{sprint?.job?.job_code}</div>
                   </Stack>
                 </Col>
               </Row>
@@ -115,13 +115,13 @@ function ViewSprintModal({
                 <Col>
                   <Stack direction="horizontal" gap={2}>
                     <strong>Sub Brand: </strong>
-                    <div>{"subbrand"}</div>
+                    <div>{sprint?.job?.subBrand}</div>
                   </Stack>
                 </Col>
                 <Col>
                   <Stack direction="horizontal" gap={2}>
                     <strong>Job Name:</strong>
-                    <div>{sprint.job.name}</div>
+                    <div>{sprint?.job?.name}</div>
                   </Stack>
                 </Col>
               </Row>
@@ -130,13 +130,13 @@ function ViewSprintModal({
                 <Col>
                   <Stack direction="horizontal" gap={2}>
                     <strong>Date From: </strong>
-                    <div>{sprint.start}</div>
+                    <div>{sprint?.start}</div>
                   </Stack>
                 </Col>
                 <Col>
                   <Stack direction="horizontal" gap={2}>
                     <strong>Date To:</strong>
-                    <div>{sprint.end}</div>
+                    <div>{sprint?.end}</div>
                   </Stack>
                 </Col>
               </Row>
@@ -144,19 +144,19 @@ function ViewSprintModal({
                 <Col>
                   <Stack direction="horizontal" gap={2}>
                     <strong>Time Allocated: </strong>
-                    <div>{sprint.job.timeAllocated} hours</div>
+                    <div>{sprint?.job?.timeAllocated} hours</div>
                   </Stack>
                 </Col>
                 <Col>
                   <Stack direction="horizontal" gap={2}>
                     <strong>Employee:</strong>
-                    <div>{sprint.employee.firstName}</div>
+                    <div>{sprint?.employee?.firstName}</div>
                   </Stack>
                 </Col>
               </Row>
               <Row className="p-2">
                 <Alert variant="secondary">
-                  <div>{"Description here"}</div>
+                  <div>{sprint?.job?.description}</div>
                 </Alert>
               </Row>
             </Tab>
@@ -184,8 +184,8 @@ function ViewSprintModal({
                         {employees &&
                           employees.map((employee) => {
                             return (
-                              <option key={employee.id} value={employee.id}>
-                                {`${employee.firstName} ${employee.surname}`}
+                              <option key={employee?.id} value={employee?.id}>
+                                {`${employee?.firstName} ${employee?.surname}`}
                               </option>
                             );
                           })}
@@ -245,7 +245,7 @@ function ViewSprintModal({
                   </Stack>
                   <Stack direction="horizontal" gap={2}>
                     <strong>Time Allocated: </strong>
-                    <div>{sprint.job.timeAllocated} hours</div>
+                    <div>{sprint?.job?.timeAllocated} hours</div>
                   </Stack>
                 </Col>
               </Row>
@@ -260,11 +260,11 @@ function ViewSprintModal({
                         direction="horizontal"
                         gap={4}
                       >
-                        <strong>{workItem.employee.firstName}: </strong>
-                        <div>{getUTCDate(workItem.dateOfWork)}</div>
+                        <strong>{workItem?.employee?.firstName}: </strong>
+                        <div>{getUTCDate(workItem?.dateOfWork)}</div>
                         <div>{workItem.hours} hours</div>
                         <CloseButton
-                          onClick={() => handleDeleteWorkItem(workItem.id)}
+                          onClick={() => handleDeleteWorkItem(workItem?.id)}
                         />
                       </Stack>
                     );
