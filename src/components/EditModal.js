@@ -1,7 +1,6 @@
 import { useState } from "react";
 import moment from "moment";
 import "moment-timezone";
-
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
@@ -16,6 +15,7 @@ function EditModal({
   employees,
   setModalState,
   handleEditSprintAndJob,
+  sprints,
 }) {
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
@@ -27,20 +27,26 @@ function EditModal({
   const [thirdPartyItem, setThirdPartyItem] = useState("");
   const [thirdPartyCost, setThirdPartyCost] = useState(0);
   const [allClient, setAllClient] = useState([]);
+  const [subBrand, setSubBrands] = useState("");
+  const [jobCode, setJobCode] = useState("");
 
   useEffect(() => {
     if (!sprint) return;
     setStart(getStartDateText());
     setEnd(getEndDateText());
-    setJobName(sprint.job.name);
-    setClientId(sprint.job.client.id);
-    setTimeAllocated(sprint.job.timeAllocated);
-    setEmployeeId(sprint.employee.id);
+    setJobName(sprint?.job?.name);
+    setJobCode(sprint?.job?.job_code);
+    setClientId(sprint?.job?.client?.id);
+    setTimeAllocated(sprint?.job?.timeAllocated);
+    setEmployeeId(sprint?.employee?.id);
+    setSubBrands(sprint?.job?.subBrand);
+    setDescription(sprint?.job?.description);
     setAllClient(getClientsDetails());
   }, [sprint]);
 
   const getClientsDetails = async () => {
     let existedClient = await fetchClients();
+    console.log("exCli", existedClient);
   };
 
   const getStartDateText = () => {
@@ -61,8 +67,41 @@ function EditModal({
       </>
     );
   }
+  console.log("....jobcode", jobCode);
+  const createJobCode = (_id) => {
+    let newFilteredArr = sprints
+      ?.filter((allData) => {
+        return allData?.job?.client?.id === _id;
+      })
+      .map((newData) => {
+        return newData;
+      });
 
-  console.log({ end });
+    if (newFilteredArr?.length > 0) {
+      newFilteredArr?.forEach((data) => {
+        let clientName = data?.job?.client?.name
+          ?.substring(0, 3)
+          ?.toUpperCase();
+        if (newFilteredArr?.length < 9) {
+          setJobCode(`${clientName}00${newFilteredArr?.length + 1}`);
+        } else if (newFilteredArr?.length < 99) {
+          setJobCode(`${clientName}0${newFilteredArr?.length + 1}`);
+        } else {
+          setJobCode(`${clientName}${newFilteredArr?.length + 1}`);
+        }
+      });
+    } else {
+      //   clients?.forEach((eachClient) => {
+      //     if (eachClient?.id === _id) {
+      //       let generateCode = `${eachClient?.name
+      //         ?.substring(0, 3)
+      //         ?.toUpperCase()}001`;
+      //       setJobCode(generateCode);
+      //     }
+      //   });
+    }
+  };
+
   return (
     <>
       <Modal
@@ -84,16 +123,17 @@ function EditModal({
                     required
                     onChange={(e) => {
                       setClientId(e.target.value);
+                      createJobCode(e.target.value);
                     }}
                     defaultValue={sprint.job.client.id}
                     aria-label="Assign to Client"
                   >
                     <option>Select Client</option>
                     {clients &&
-                      clients.map((client) => {
+                      clients?.map((client) => {
                         return (
-                          <option key={client.id} value={client.id}>
-                            {client.name}
+                          <option key={client?.id} value={client?.id}>
+                            {client?.name}
                           </option>
                         );
                       })}
@@ -104,20 +144,35 @@ function EditModal({
                 <Form.Group className="mb-3" controlId="subBrandInputAdd">
                   <Form.Label>Sub Brand</Form.Label>
                   <Form.Select
-                    disabled
                     onChange={(e) => {
-                      //   setClient(e.target.value);
+                      setSubBrands(e.target.value);
                     }}
+                    value={subBrand}
                     aria-label="Assign to Sub Brand"
                   >
                     <option>Assign to Sub Brand</option>
-                    {clients &&
-                      clients.map((client) => {
-                        return (
-                          <option key={client.id} value={client.id}>
-                            {client.name}
-                          </option>
-                        );
+
+                    {clientId &&
+                      clients?.map((clientData, index) => {
+                        if (clientData?.subbrand?.length > 0) {
+                          if (clientData.id === clientId) {
+                            return clientData?.subbrand?.map(
+                              (subData, index) => {
+                                return (
+                                  <option key={index} value={subData}>
+                                    {subData}
+                                  </option>
+                                );
+                              }
+                            );
+                          }
+                        } else {
+                          return (
+                            <option key={index} value="None">
+                              None
+                            </option>
+                          );
+                        }
                       })}
                   </Form.Select>
                 </Form.Group>
@@ -158,10 +213,9 @@ function EditModal({
                 <Form.Group className="mb-3" controlId="jobCodeInputAdd">
                   <Form.Label>Job Code</Form.Label>
                   <Form.Control
-                    disabled
                     type="text"
-                    onChange={(e) => setJobName(e.target.value)}
-                    defaultValue={""}
+                    value={jobCode}
+                    onChange={(e) => setJobCode(e.target.value)}
                     placeholder={"DIAXXXX"}
                   />
                 </Form.Group>
@@ -221,13 +275,13 @@ function EditModal({
               <Form.Group className="mb-3" controlId="descriptionInputAdd">
                 <Form.Label>Description</Form.Label>
                 <Form.Control
-                  disabled
                   type="text"
                   as="textarea"
                   style={{ height: "100px" }}
+                  value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  defaultValue={""}
-                  placeholder={"Description"}
+                  defaultValue={description}
+                  placeholder={description}
                 />
               </Form.Group>
             </Row>
@@ -236,7 +290,6 @@ function EditModal({
                 <Form.Group className="mb-3" controlId="thirdPartyItemInputAdd">
                   <Form.Label>Third Party Item</Form.Label>
                   <Form.Control
-                    disabled
                     type="text"
                     onChange={(e) => setThirdPartyItem(e.target.value)}
                     defaultValue={""}
@@ -248,7 +301,6 @@ function EditModal({
                 <Form.Group className="mb-3" controlId="thirdPartyCost">
                   <Form.Label>Cost £</Form.Label>
                   <Form.Control
-                    disabled
                     type="number"
                     onChange={(e) => setThirdPartyCost(e.target.value)}
                     defaultValue={""}
@@ -277,7 +329,8 @@ function EditModal({
                 clientId,
                 timeAllocated: parseInt(timeAllocated, 10),
               };
-              handleEditSprintAndJob(sprintData, jobData);
+              if (start && end && jobName && description)
+                handleEditSprintAndJob(sprintData, jobData);
               setStart("");
               setEnd("");
               setJobName("");

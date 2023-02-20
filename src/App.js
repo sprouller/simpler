@@ -7,6 +7,7 @@ import MyCalendar from "./components/MyCalendar";
 import SideNavBar from "./components/SideNavBar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ClientPage from "./components/ClientPage";
+import SpecificClient from "./components/SpecificClient";
 
 function App() {
   //set theme by navbar and reflect it in app style
@@ -42,6 +43,7 @@ function App() {
           />
 
           <Route path="/client" element={<ClientPage />} />
+          <Route path="/client/:id" element={<SpecificClient />} />
         </Routes>
       </div>
     </BrowserRouter>

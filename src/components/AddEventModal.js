@@ -38,7 +38,7 @@ function AddEventModal({
     setEnd(getEndDateText());
     clientId && setJobCode();
   }, [startDate, endDate]);
-
+  console.log("addEvent", startDate, endDate);
   console.log({ startDate });
   console.log({ start });
 
@@ -67,6 +67,7 @@ function AddEventModal({
   //   });
   //
   const createJobCode = (_id) => {
+    console.log(sprint, typeof sprint);
     let newFilteredArr = sprint
       ?.filter((allData) => {
         return allData?.job?.client?.id === _id;
@@ -322,7 +323,8 @@ function AddEventModal({
                 description,
                 subBrand,
               };
-              handleScheduleJob(job, sprint);
+              if (jobName && jobCode && description && start && end)
+                handleScheduleJob(job, sprint);
               setStart("");
               setEnd("");
               setJobName("");

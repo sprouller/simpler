@@ -79,6 +79,8 @@ export async function fetchClients() {
       id: client.get("id"),
       name: client.get("name"),
       subbrand: client.get("subbrand"),
+      comp_logo: client.get("comp_logo"),
+      client_type: client.get("client_type"),
     };
   });
 }
@@ -105,6 +107,29 @@ export async function fetchWorkItemsByJobId(jobId) {
       },
     };
   });
+}
+
+export async function addNewClient(clientDetails) {
+  let { clientType, subClientArr, description, client, createdAt, compLogo } =
+    clientDetails;
+
+  try {
+    let returnedNewClient = await base(
+      process.env.REACT_APP_CLIENTS_TABLE_ID
+    ).create({
+      name: client,
+      // client_since: createdAt,
+      // subbrand: subClientArr,
+      client_type: clientType,
+      description: description,
+      comp_logo: compLogo,
+    });
+    console.log("airTable compLogo", compLogo);
+    let clinetId = returnedNewClient.getId();
+    console.log(`Client ${clinetId} added to Airtable`);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function addJobAndSprintToAirtable(job, sprint) {
