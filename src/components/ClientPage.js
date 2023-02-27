@@ -17,7 +17,7 @@ function ClientPage() {
   const [clt, setClt] = useState([]);
   const [projectBasedClt, setProjectBasedClt] = useState([]);
   const [retainerClt, setRetainerClt] = useState([]);
-  console.log(clt);
+
   const getClientsDetails = async () => {
     let allClients = await fetchClients();
     setClt(allClients);

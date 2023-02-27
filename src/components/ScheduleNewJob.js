@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import closeIcon from "../images/closeIcon.svg";
 import { Col, Form, Modal, ModalBody, ModalHeader, Row } from "react-bootstrap";
-import plusIconWhite from "../images/plusIconWhite.svg";
 import moment from "moment";
 import "moment-timezone";
 

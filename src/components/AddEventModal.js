@@ -1,13 +1,11 @@
 import { useState } from "react";
 import moment from "moment";
 import "moment-timezone";
-
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
-import { fetchClients } from "../controller/Airtable";
 
 function AddEventModal({
   addEventModalStatus,
@@ -38,7 +36,6 @@ function AddEventModal({
     setEnd(getEndDateText());
     clientId && setJobCode();
   }, [startDate, endDate]);
-  console.log("addEvent", startDate, endDate);
   console.log({ startDate });
   console.log({ start });
 
@@ -55,17 +52,7 @@ function AddEventModal({
     }
     return moment.utc(endDate).format("DD/MM/YY");
   };
-  //   const convertDateForAirtable = (dateStrDDMMYYYY) => {
-  //     var dateParts = dateStrDDMMYYYY.split("/");
-  //     // month is 0-based, that's why we need dataParts[1] - 1
-  //     var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
-  //     return dateObject;
-  //   };
 
-  //   let clientName = clients.filter((clientObj, index) => {
-  //     clientObj.id === clientId;
-  //   });
-  //
   const createJobCode = (_id) => {
     console.log(sprint, typeof sprint);
     let newFilteredArr = sprint

@@ -82,6 +82,8 @@ function SpecificClient() {
                 marginRight: "0",
                 borderTopLeftRadius: "20px",
                 borderBottomLeftRadius: "20px",
+                borderTopRightRadius: "0px",
+                borderBottomRightRadius: "0px",
                 boxShadow: "none",
               }}
             >
@@ -90,8 +92,8 @@ function SpecificClient() {
                 <img src={searchIcon} alt="search icon" />
                 <input type="text" placeholder="Search" />
               </div>
-              <table className="table__specificClient">
-                <thead className="thead__specificClient my-2">
+              <div className="tableCont__specificClient">
+                <table className="table__specificClient">
                   <tr>
                     <th>Job code</th>
                     <th>Job name</th>
@@ -99,8 +101,7 @@ function SpecificClient() {
                     <th>Time spent (hrs)</th>
                     <th>Time allocated (hrs)</th>
                   </tr>
-                </thead>
-                <tbody className="tbody__specificClient">
+                  {/* below data is dynamic  */}
                   <tr>
                     <td>ZOO001</td>
                     <td>sketch design</td>
@@ -108,8 +109,8 @@ function SpecificClient() {
                     <td>6</td>
                     <td>25</td>
                   </tr>
-                </tbody>
-              </table>
+                </table>
+              </div>
             </div>
             <div
               className="ml-0 retainerBased-detailsContainer__clientPage commonContainer-detailsContainer__clientPage"
@@ -119,12 +120,29 @@ function SpecificClient() {
                 borderTopRightRadius: "20px",
                 borderBottomRightRadius: "20px",
                 boxShadow: "none",
+                borderTopLeftRadius: "0px",
+                borderBottomLeftRadius: "0px",
               }}
             >
               <p>Third party cost</p>
               <div className="searchContainer-detailsContainer__clientPage">
                 <img src={searchIcon} alt="search icon" />
                 <input type="text" placeholder="Search" />
+              </div>
+              <div className="tableCont__specificClient">
+                <table className="table__specificClient">
+                  <tr>
+                    <th style={{ width: "60%" }}>Description</th>
+                    <th>Date</th>
+                    <th>cost</th>
+                  </tr>
+                  {/* below data is dynamic  */}
+                  <tr>
+                    <td>ZOO001</td>
+                    <td>sketch design</td>
+                    <td>100</td>
+                  </tr>
+                </table>
               </div>
             </div>
           </div>

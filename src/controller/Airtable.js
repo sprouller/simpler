@@ -85,6 +85,19 @@ export async function fetchClients() {
   });
 }
 
+export async function fetchCred() {
+  const credTableId = process.env.REACT_APP_CREDENTIAL_TABLE_ID;
+  const allCred = await base(credTableId).select().all();
+  return allCred.map((client) => {
+    return {
+      id: client.get("id"),
+      type: client.get("type"),
+      email: client.get("email"),
+      password: client.get("password"),
+    };
+  });
+}
+
 export async function fetchWorkItemsByJobId(jobId) {
   const workItemsTableId = process.env.REACT_APP_WORK_ITEMS_TABLE_ID;
   const workItems = await base(workItemsTableId)

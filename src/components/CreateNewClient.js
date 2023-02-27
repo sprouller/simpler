@@ -14,7 +14,7 @@ function CreateNewClient({ show, setShow }) {
   const [subClient, setSubClient] = useState("");
   const [description, setDescription] = useState("");
   const [compLogo, setCompLogo] = useState({});
-  console.log(compLogo);
+
   const handleDelete = (eachClient) => {
     const filterArr = subClientArr.filter((data, index) => data !== eachClient);
     setSubClientArr(filterArr);
@@ -35,7 +35,7 @@ function CreateNewClient({ show, setShow }) {
             className="btn-newClient-header__clientPage m-3"
             onClick={() => {
               // today = moment.utc(today).format("DD/MM/YYYY");
-              console.log(subClientArr, compLogo);
+
               const clientDetails = {
                 clientType,
                 // subClientArr,

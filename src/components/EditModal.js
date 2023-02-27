@@ -46,7 +46,6 @@ function EditModal({
 
   const getClientsDetails = async () => {
     let existedClient = await fetchClients();
-    console.log("exCli", existedClient);
   };
 
   const getStartDateText = () => {
@@ -67,7 +66,6 @@ function EditModal({
       </>
     );
   }
-  console.log("....jobcode", jobCode);
   const createJobCode = (_id) => {
     let newFilteredArr = sprints
       ?.filter((allData) => {

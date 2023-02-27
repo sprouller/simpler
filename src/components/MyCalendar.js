@@ -1,7 +1,6 @@
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import { useState } from "react";
 import moment from "moment";
-import moment_timezone from "moment-timezone";
 import AddEventModal from "./AddEventModal";
 import ViewSprintModal from "./ViewSprintModal";
 import EditModal from "./EditModal";
@@ -10,7 +9,6 @@ import { Container, Row } from "react-bootstrap";
 import { useEffect } from "react";
 import plusIconWhite from "../images/plusIconWhite.svg";
 import refreshIcon from "../images/refreshIcon.svg";
-import eyeIcon from "../images/eye.svg";
 
 import {
   addJobAndSprintToAirtable,
@@ -32,6 +30,12 @@ localizer.segmentOffset = 0;
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
+moment.locale("ko", {
+  week: {
+    dow: 1,
+    doy: 1,
+  },
+});
 // react BasicCalendar component
 const BasicCalendar = () => {
   const [sprints, setSprints] = useState([]);
@@ -51,6 +55,7 @@ const BasicCalendar = () => {
   const [currentView, setCurrentView] = useState("month");
   const [filteredSprint, setFilteredSprint] = useState([]);
   const [showScheduleJobModal, setShowScheduleJobModal] = useState(false);
+  const [logedUser, setLoggedUser] = useState({});
   console.log("date.....", startDate, endDate);
 
   useEffect(() => {
@@ -63,6 +68,8 @@ const BasicCalendar = () => {
     fetchEmployees().then((employeesFromAirtable) => {
       setEmployees(employeesFromAirtable);
     });
+    // localStorage.getItem()
+    // setLoggedUser(JSON.parse(localStorage?.getItem("userCred")));
     currentMonthsDates();
     console.log("localizer", localizer);
   }, []);
@@ -230,6 +237,8 @@ const BasicCalendar = () => {
       color: "white",
       border: "0px",
       display: "block",
+      width: " 98%",
+      marginLeft: "5px",
       hover: {
         visbility: "hidden",
       },
@@ -275,13 +284,26 @@ const BasicCalendar = () => {
     });
   }
 
+  // const MonthView = ({ date, ...props }) => {
+  //   const start = moment(date).startOf("month");
+  //   const end = moment(date).startOf("month").add(27, "days");
+  //   return (
+  //     <BigCalendar
+  //       {...props}
+  //       date={date}
+  //       view={"month"}
+  //       startAccessor={() => start.toDate()}
+  //       endAccessor={() => end.toDate()}
+  //     />
+  //   );
+  // };
+
   return (
     <div className="my-calendar">
       {/* <div> */}
       {/* Display a message indicating whether the shift key is being held down or not */}
       {/* <p>Alt key is {altKeyDown ? "down" : "up"}</p>
       </div> */}
-
       <Container className="calenderTopBar">
         <Row className="container-calenderTopBar">
           <div className="leftPart-calenderTopBar">
@@ -364,6 +386,41 @@ const BasicCalendar = () => {
           // min={dates.firstDay}
           // max={dates.lastDay}
           // views={["month", "week"]}
+          // onRangeChange={}
+          showAllEvents={true}
+          components={{
+            month: {
+              event: (props) => {
+                return (
+                  <div className="cellEvent__myCalendar">
+                    <span>clients : {props?.event?.job?.client?.name}</span> |
+                    <span>
+                      {" "}
+                      Job code :{" "}
+                      {props?.event?.job?.job_code?.length > 0
+                        ? props?.event?.job?.job_code
+                        : "none"}{" "}
+                    </span>
+                    | <span> {props?.event?.employee?.firstName}</span>
+                  </div>
+                );
+              },
+              dateHeader: (props) => {
+                // console.log("propsoos", props.date);
+                const date = moment(props.date);
+                return (
+                  <div className="cellOptions__myCalendar">
+                    <p className="day-cellOptions__myCalendar">
+                      {date.format("dddd")}
+                    </p>
+                    <p className="date-cellOptions__myCalendar">
+                      {props.label}
+                    </p>
+                  </div>
+                );
+              },
+            },
+          }}
           view={currentView}
           date={new Date()}
           showMultiDayTimes
@@ -402,10 +459,10 @@ const BasicCalendar = () => {
           // onSelecting={slot => false}
           longPressThreshold={10}
           eventPropGetter={handleEventStyles}
+          // dayLayoutAlgorithm={(e) => console.log("dayLayout", e)}
           // resizableAccessor
         />
       </div>
-
       <AddEventModal
         modalState={modalState}
         startDate={startDate}
@@ -423,6 +480,7 @@ const BasicCalendar = () => {
         setModalState={setModalState}
         handleClose={handleClose}
         handleDeleteSprint={handleDeleteSprint}
+        logedUser={logedUser}
       />
       <EditModal
         modalState={modalState}
