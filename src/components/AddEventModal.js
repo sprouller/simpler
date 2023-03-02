@@ -303,13 +303,8 @@ function AddEventModal({
             variant="success"
             onClick={() => {
               const sprint = {
-                start: moment(
-                  `${start.replace("/", "").trim()}`,
-                  "DDMMYY"
-                ).format("yyyy[-]MM[-]DD"),
-                end: moment(`${end.replace("/", "").trim()}`, "DDMMYY").format(
-                  "yyyy[-]MM[-]DD"
-                ),
+                start: moment(`${start.replace("/", "").trim()}`, "DDMMYY").format("yyyy[-]MM[-]DD"),
+                end: moment(`${end.replace("/", "").trim()}`, "DDMMYY").format("yyyy[-]MM[-]DD"),
                 employeeId,
               };
               const job = {
