@@ -183,7 +183,7 @@ body {
 .rbc-show-more {
   color: var(--theme-color);
 }
-*/
+
 /* today color  */
  .rbc-day-bg.rbc-today {
   transition: background-color 0.5s;
