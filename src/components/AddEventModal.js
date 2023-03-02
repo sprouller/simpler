@@ -1,13 +1,11 @@
 import { useState } from "react";
 import moment from "moment";
 import "moment-timezone";
-
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
-import { fetchClients } from "../controller/Airtable";
 
 function AddEventModal({
   addEventModalStatus,
@@ -38,7 +36,6 @@ function AddEventModal({
     setEnd(getEndDateText());
     clientId && setJobCode();
   }, [startDate, endDate]);
-
   console.log({ startDate });
   console.log({ start });
 
@@ -55,18 +52,9 @@ function AddEventModal({
     }
     return moment.utc(endDate).format("DD/MM/YY");
   };
-  //   const convertDateForAirtable = (dateStrDDMMYYYY) => {
-  //     var dateParts = dateStrDDMMYYYY.split("/");
-  //     // month is 0-based, that's why we need dataParts[1] - 1
-  //     var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
-  //     return dateObject;
-  //   };
 
-  //   let clientName = clients.filter((clientObj, index) => {
-  //     clientObj.id === clientId;
-  //   });
-  //
   const createJobCode = (_id) => {
+    console.log(sprint, typeof sprint);
     let newFilteredArr = sprint
       ?.filter((allData) => {
         return allData?.job?.client?.id === _id;
@@ -127,10 +115,10 @@ function AddEventModal({
                   >
                     <option>Select Client</option>
                     {clients &&
-                      clients.map((client) => {
+                      clients?.map((client) => {
                         return (
-                          <option key={client.id} value={client.id}>
-                            {client.name}
+                          <option key={client?.id} value={client?.id}>
+                            {client?.name}
                           </option>
                         );
                       })}
@@ -149,15 +137,25 @@ function AddEventModal({
                   >
                     <option>Assign to Sub Brand</option>;
                     {clientId &&
-                      clients.map((clientData) => {
-                        if (clientData.id === clientId) {
-                          return clientData.subbrand.map((subData, index) => {
-                            return (
-                              <option key={index} value={subData}>
-                                {subData}
-                              </option>
+                      clients?.map((clientData, index) => {
+                        if (clientData?.subbrand?.length > 0) {
+                          if (clientData.id === clientId) {
+                            return clientData?.subbrand?.map(
+                              (subData, index) => {
+                                return (
+                                  <option key={index} value={subData}>
+                                    {subData}
+                                  </option>
+                                );
+                              }
                             );
-                          });
+                          }
+                        } else {
+                          return (
+                            <option key={index} value="None">
+                              None
+                            </option>
+                          );
                         }
                       })}
                   </Form.Select>
@@ -322,7 +320,8 @@ function AddEventModal({
                 description,
                 subBrand,
               };
-              handleScheduleJob(job, sprint);
+              if (jobName && jobCode && description && start && end)
+                handleScheduleJob(job, sprint);
               setStart("");
               setEnd("");
               setJobName("");

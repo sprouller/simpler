@@ -2,17 +2,49 @@ import React, { useEffect, useState } from "react";
 import plusIconWhite from "../images/plusIconWhite.svg";
 import refreshIcon from "../images/refreshIcon.svg";
 import searchIcon from "../images/searchIcon.svg";
+import defaultImage from "../images/flower-green.svg";
+import { useNavigate } from "react-router-dom";
 import { fetchClients } from "../controller/Airtable";
 import "../App.css";
+import CreateNewClient from "./CreateNewClient";
 
 function ClientPage() {
+  const location = useNavigate();
   const [activeBtn, setActiveBtn] = useState(false);
   const [PBSearch, setPBSearch] = useState("");
   const [RBSearch, setRBSearch] = useState("");
+  const [showClientModal, setShowClientModal] = useState(false);
+  const [clt, setClt] = useState([]);
+  const [projectBasedClt, setProjectBasedClt] = useState([]);
+  const [retainerClt, setRetainerClt] = useState([]);
 
   const getClientsDetails = async () => {
-    let existedClient = await fetchClients();
-    console.log("exClClientPage....", existedClient);
+    let allClients = await fetchClients();
+    setClt(allClients);
+    setProjectBasedClt(
+      allClients.filter((data) => data.client_type === "Project based")
+    );
+    setRetainerClt(
+      allClients.filter((data) => data.client_type === "Retainer")
+    );
+  };
+
+  const handleRetainSearch = (e) => {
+    let filteredClient = retainerClt.filter((data) => {
+      return data.name
+        .toLowerCase()
+        .includes(e.target.value.toLocaleLowerCase());
+    });
+    e.target.value.length > 0 && setRetainerClt(filteredClient);
+  };
+
+  const handleProjectSearch = (e) => {
+    let filteredClient = projectBasedClt.filter((data) => {
+      return data.name
+        .toLowerCase()
+        .includes(e.target.value.toLocaleLowerCase());
+    });
+    e.target.value.length > 0 && setProjectBasedClt(filteredClient);
   };
 
   useEffect(() => {
@@ -22,7 +54,7 @@ function ClientPage() {
   return (
     <div className="clientPage">
       <div className="header__clientPage">
-        <p>Clients</p>
+        <p className="header__clientPageTitle">Clients</p>
         <div className="rightPart-header__clientPage">
           <div className="clientDetails-header__clientPage">
             <div className="btnGroup-header__clientPage">
@@ -49,16 +81,24 @@ function ClientPage() {
             </div>
           </div>
           <div className="newClient-header__clientPage">
-            <button className="btn-newClient-header__clientPage">
+            <button
+              className="btn-newClient-header__clientPage"
+              onClick={() => setShowClientModal(!showClientModal)}
+            >
               <img src={plusIconWhite} alt="plus icon white" />
               New client
             </button>
           </div>
           <div className="refreshIcon-header__clientPage">
-            <img src={refreshIcon} alt="refresh icon" />
+            <img
+              src={refreshIcon}
+              alt="refresh icon"
+              onClick={() => getClientsDetails()}
+            />
           </div>
         </div>
       </div>
+
       <div className="detailsContainer__clientPage">
         <div className="projectBased-detailsContainer__clientPage commonContainer-detailsContainer__clientPage">
           <p>Project based clients</p>
@@ -67,18 +107,33 @@ function ClientPage() {
             <input
               type="text"
               value={PBSearch}
-              onChange={(e) => setPBSearch(e.target.value)}
+              onChange={(e) => {
+                setPBSearch(e.target.value);
+                e.target.value.length > 0
+                  ? handleProjectSearch(e)
+                  : getClientsDetails();
+              }}
               placeholder="Search"
             />
           </div>
           <div className="dataContainer-detailsContainer__clientPage">
-            <div className="data-detailsContainer__clientPage">
-              <img
-                src="https://images.pling.com/img/00/00/56/23/58/1470346/f070d046fb9bad8048a64713d78ad2a77b0665dc5d423f8d49812ad98a5975e358a9.png"
-                alt="client company logo"
-              />
-              <p>The test logo for testing</p>
-            </div>
+            {projectBasedClt.map((data) => {
+              return (
+                <div
+                  className="data-detailsContainer__clientPage"
+                  key={data?.id}
+                  onClick={() => {
+                    location(`/client/${data?.id}`);
+                  }}
+                >
+                  <img
+                    src={data.comp_logo ? data.comp_logo[0].url : defaultImage}
+                    alt={data?.name}
+                  />
+                  <p>{data?.name}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
         <div className="retainerBased-detailsContainer__clientPage commonContainer-detailsContainer__clientPage">
@@ -88,21 +143,38 @@ function ClientPage() {
             <input
               type="text"
               value={RBSearch}
-              onChange={(e) => setRBSearch(e.target.value)}
+              onChange={(e) => {
+                setRBSearch(e.target.value);
+                e.target.value.length > 0
+                  ? handleRetainSearch(e)
+                  : getClientsDetails();
+              }}
               placeholder="Search"
             />
           </div>
           <div className="dataContainer-detailsContainer__clientPage">
-            <div className="data-detailsContainer__clientPage">
-              <img
-                src="https://images.pling.com/img/00/00/56/23/58/1470346/f070d046fb9bad8048a64713d78ad2a77b0665dc5d423f8d49812ad98a5975e358a9.png"
-                alt="client company logo"
-              />
-              <p>The test logo for testing</p>
-            </div>
+            {retainerClt.map((data) => {
+              return (
+                <div
+                  className="data-detailsContainer__clientPage"
+                  key={data.id}
+                  onClick={() => location(`/client/${data?.id}`)}
+                >
+                  <img
+                    src={data.comp_logo ? data.comp_logo[0].url : defaultImage}
+                    alt={data.name}
+                  />
+                  <p>{data.name}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
+
+      {showClientModal && (
+        <CreateNewClient show={showClientModal} setShow={setShowClientModal} />
+      )}
     </div>
   );
 }

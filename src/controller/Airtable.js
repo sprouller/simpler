@@ -67,6 +67,21 @@ export async function fetchEmployees() {
       firstName: employee.get("first_name"),
       surname: employee.get("surname"),
       colour: employee.get("colour"),
+      description:
+        employee?.get("description") !== undefined &&
+        employee?.get("description"),
+      title: employee?.get("title") !== undefined && employee?.get("title"),
+      number: employee?.get("number") !== undefined && employee?.get("number"),
+      startedDate:
+        employee?.get("startedDate") !== undefined &&
+        employee?.get("startedDate "),
+      address:
+        employee?.get("address") !== undefined && employee?.get("address"),
+      dateOfBirth:
+        employee?.get("dateOfBirth") !== undefined &&
+        employee?.get("dateOfBirth"),
+      holiday:
+        employee?.get("holiday") !== undefined && employee?.get("holiday"),
     };
   });
 }
@@ -79,6 +94,25 @@ export async function fetchClients() {
       id: client.get("id"),
       name: client.get("name"),
       subbrand: client.get("subbrand"),
+      comp_logo: client.get("comp_logo"),
+      client_type: client.get("client_type"),
+      jobs: client.get("Jobs"),
+      address: client.get("address"),
+    };
+  });
+}
+
+export async function fetchCred() {
+  const credTableId = process.env.REACT_APP_CREDENTIAL_TABLE_ID;
+  const allCred = await base(credTableId).select().all();
+  return allCred.map((client) => {
+    console.log("airtble", client);
+    return {
+      id: client.get("id"),
+      type: client.get("type"),
+      email: client.get("email"),
+      password: client.get("password"),
+      clientDetails: client.get("clientDetails"),
     };
   });
 }
@@ -105,6 +139,68 @@ export async function fetchWorkItemsByJobId(jobId) {
       },
     };
   });
+}
+
+export async function addNewClient(clientDetails) {
+  let { clientType, subClientArr, description, client, createdAt, compLogo } =
+    clientDetails;
+
+  try {
+    let returnedNewClient = await base(
+      process.env.REACT_APP_CLIENTS_TABLE_ID
+    ).create({
+      name: client,
+      // client_since: createdAt,
+      // subbrand: subClientArr,
+      client_type: clientType,
+      description: description,
+      comp_logo: compLogo,
+    });
+    console.log("airTable compLogo", compLogo);
+    let clinetId = returnedNewClient.getId();
+    console.log(`Client ${clinetId} added to Airtable`);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function addNewEmployee(data, active) {
+  let { name, des, color, title, num, startedDate, address, dob, holiday } =
+    data;
+  try {
+    if (active === true) {
+      let returnedNewClient = await base(
+        process.env.REACT_APP_EMPLOYEES_TABLE_ID
+      ).create({
+        first_name: name,
+        surname: "patel",
+        description: des,
+        colour: color,
+      });
+      let clinetId = returnedNewClient.getId();
+      console.log(`Client ${clinetId} added to Airtable`);
+    } else {
+      let returnedNewClient = await base(
+        process.env.REACT_APP_EMPLOYEES_TABLE_ID
+      ).create({
+        first_name: name,
+        surname: "patel",
+        description: des,
+        colour: color,
+        title: title,
+        number: num,
+        startedDate,
+        address,
+        dateOfBirth: dob,
+        holiday,
+      });
+
+      let clinetId = returnedNewClient.getId();
+      console.log(`Client ${clinetId} added to Airtable`);
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function addJobAndSprintToAirtable(job, sprint) {

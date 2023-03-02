@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import calenderSvgGreen from "../images/calender-green.svg";
 import clientSvgGreen from "../images/persons-green.svg";
@@ -7,11 +7,21 @@ import clientSvgGray from "../images/persons-gray.svg";
 import leftArrowSvg from "../images/leftArrow.svg";
 import rightArrowSvg from "../images/rightArrow.svg";
 import logo from "../images/holla-icon.svg";
+import loginSvg from "../images/loginSvg.svg";
 import mobileLogo from "../images/holla-mobile-logo.svg";
 
-const Navbar = ({ toggleStyle }) => {
+const Navbar = ({ userDetails }) => {
   const [hover, setHover] = useState(false);
   const location = useLocation();
+  const [cred, setCred] = useState({});
+
+  const handleCredDetails = () => {
+    setCred(localStorage?.getItem("userCred"));
+  };
+  useEffect(() => {
+    handleCredDetails();
+  }, [userDetails]);
+
   return (
     <nav
       className="side-nav-bar"
@@ -80,16 +90,33 @@ const Navbar = ({ toggleStyle }) => {
           </li>
         </ul>
       </div>
-      <div
-        className="headerBottom-content__container"
-        onClick={() => setHover(!hover)}
-      >
-        <div className="image-headerBottom__container">
-          {hover ? (
-            <img src={leftArrowSvg} alt="left Arrow" />
-          ) : (
-            <img src={rightArrowSvg} alt="right Arrow" />
-          )}
+      <div>
+        <div
+          className="headerBottom-content__container"
+          onClick={() => setHover(!hover)}
+        >
+          <div className="image-headerBottom__container">
+            {hover ? (
+              <img src={leftArrowSvg} alt="left Arrow" />
+            ) : (
+              <img src={rightArrowSvg} alt="right Arrow" />
+            )}
+          </div>
+        </div>
+        <div className="userDetailsCont__sideBar">
+          <Link to="/signin" style={{ width: "fit-content" }}>
+            {Object?.keys(cred)?.length > 1 ? (
+              <div className="userDetails__sideBar">
+                <p>{JSON.parse(cred)?.email?.slice(0, 1)}</p>
+              </div>
+            ) : (
+              <img
+                className="loginSvgIcon"
+                src={loginSvg}
+                alt="login svg icon"
+              />
+            )}
+          </Link>
         </div>
       </div>
     </nav>

@@ -23,6 +23,7 @@ function ViewSprintModal({
   sprint,
   setModalState,
   employees,
+  logedUser,
   handleDeleteSprint,
 }) {
   const [date, setDate] = useState(new Date().toLocaleDateString());

@@ -1,5 +1,5 @@
 @media (min-width: 991.98px) {
-  .rbc-btn-group > button {
+  /* .rbc-btn-group > button {
     padding: 16px 19px !important;
   }
 
@@ -13,13 +13,12 @@
     font-size: 16px;
   }
   .rbc-btn-group {
-    box-shadow: 1px 1px 13px #e7e7e7, -1px -1px 13px #ffffff;
     overflow: hidden;
-  }
+  } */
 }
 
 @media (max-width: 991.98px) {
-  .rbc-toolbar-label {
+  /* .rbc-toolbar-label {
     font-size: 25px;
     position: relative;
   }
@@ -38,12 +37,12 @@
   .rbc-toolbar .rbc-toolbar-label {
     padding: 0 0px;
     font-size: 22px;
-  }
+  } */
 }
 
 @media (max-width: 767.98px) {
   /* header toolbar  */
-  .rbc-toolbar {
+  /* .rbc-toolbar {
     display: flex;
     flex-direction: row;
     padding: 0px 0px !important;
@@ -90,16 +89,16 @@
   }
   .rbc-btn-group > button {
     padding: 11px 13px !important;
-  }
+  } */
   /* side bar  */
 
   /* month view  */
-  .rbc-month-view {
+  /* .rbc-month-view {
     font-size: 14px;
-  }
+  } */
 }
 @media (max-width: 665px) {
-  .rbc-toolbar .rbc-btn-group {
+  /* .rbc-toolbar .rbc-btn-group {
     flex-basis: 100%;
     text-align: center;
   }
@@ -122,7 +121,7 @@
 
   .rbc-time-slot .rbc-label {
     font-size: 13px;
-  }
+  } */
   /* .rbc-time-view .rbc-time-header-gutter{
         width: 38.1875px;
         min-width: 65.1875px;
@@ -130,7 +129,7 @@
     } */
 }
 
-@media (max-width: 444px) {
+/* @media (max-width: 444px) {
   .rbc-btn-group > button {
     font-size: 13px !important;
   }
@@ -147,4 +146,4 @@
   .my-calendar {
     height: 100%;
   }
-}
+} */

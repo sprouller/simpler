@@ -1,12 +1,15 @@
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import { useState } from "react";
 import moment from "moment";
-import moment_timezone from "moment-timezone";
 import AddEventModal from "./AddEventModal";
 import ViewSprintModal from "./ViewSprintModal";
 import EditModal from "./EditModal";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import { Container, Row } from "react-bootstrap";
 import { useEffect } from "react";
+import plusIconWhite from "../images/plusIconWhite.svg";
+import refreshIcon from "../images/refreshIcon.svg";
+
 import {
   addJobAndSprintToAirtable,
   addSprintToExistingJobInTable,
@@ -18,6 +21,9 @@ import {
   fetchEmployees,
   fetchSprints,
 } from "../controller/Airtable";
+import LeftCalendarSec from "./LeftCalendarSec";
+import ScheduleNewJob from "./ScheduleNewJob";
+import { useCallback } from "react";
 
 moment.tz.setDefault("Etc/GMT");
 const localizer = momentLocalizer(moment);
@@ -25,8 +31,29 @@ localizer.segmentOffset = 0;
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
+const monthsArr = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+moment.locale("ko", {
+  week: {
+    dow: 1,
+    doy: 1,
+  },
+});
 // react BasicCalendar component
-const BasicCalendar = () => {
+const BasicCalendar = ({ handleClient }) => {
   const [sprints, setSprints] = useState([]);
   const [clients, setClients] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -38,6 +65,15 @@ const BasicCalendar = () => {
   //state for on select event
   const [sprintId, setSprintId] = useState("");
   const [altKeyDown, setAltKeyDown] = useState(false);
+  const [dates, setDates] = useState({ firstDay: null, lastDay: null });
+  console.log("This months Dates", dates);
+  // calender view
+  const [currentView, setCurrentView] = useState("month");
+  const [filteredSprint, setFilteredSprint] = useState([]);
+  const [showScheduleJobModal, setShowScheduleJobModal] = useState(false);
+  const [logedUser, setLoggedUser] = useState({});
+  const [selectedMonth, setSelectedMonth] = useState(moment().format("MMMM"));
+  console.log("date.....", startDate, endDate);
 
   useEffect(() => {
     fetchSprints().then((sprintsFromAirtable) => {
@@ -49,7 +85,16 @@ const BasicCalendar = () => {
     fetchEmployees().then((employeesFromAirtable) => {
       setEmployees(employeesFromAirtable);
     });
+
+    // localStorage.getItem()
+    // setLoggedUser(JSON.parse(localStorage?.getItem("userCred")));
+    currentMonthsDates();
+    console.log("localizer", localizer);
   }, []);
+
+  // useEffect(() => {
+
+  // }, [startDate, endDate]);
 
   console.log({ sprints });
   console.log({ employees });
@@ -187,7 +232,7 @@ const BasicCalendar = () => {
   // };
 
   //on select event handler
-  const hanldeOnSelectEvent = (e) => {
+  const handleOnSelectEvent = (e) => {
     console.log({ e });
     setStartDate(new Date(`${e.start}`));
     setEndDate(new Date(`${e.end}`));
@@ -203,48 +248,270 @@ const BasicCalendar = () => {
 
   console.log({ selectedSprint });
 
+  const handleEventStyles = (event) => {
+    const bgColor = event?.employee?.colour;
+    const style = {
+      backgroundColor: event?.employee?.colour,
+      borderRadius: "10px",
+      color: bgColor.slice(0, 6) === ("#FFFFF" || "#fffff") ? "#000" : "#fff",
+      border: "0px",
+      display: "block",
+      width: "97%",
+      marginLeft: "5px",
+      hover: {
+        visbility: "hidden",
+      },
+    };
+    return {
+      style: style,
+    };
+  };
+
+  const handleResizeEvent = async (event, start, end) => {
+    console.log("event", event, startDate, endDate);
+    let microSecondDate = new Date(Date.parse(end));
+    microSecondDate = microSecondDate.setDate(microSecondDate.getDate() - 1);
+    let dragEndDate = new Date(microSecondDate);
+    console.log(".......Resize", event);
+
+    setStartDate(event?.start);
+    setEndDate(dragEndDate);
+    const sprintData = {
+      sprintId: event?.event?.id,
+      start_date: start,
+      end_date: dragEndDate,
+      employeeId: event?.event?.employee?.id,
+    };
+    const res = await editSprintInTable(sprintData);
+    fetchSprints().then((sprintsFromAirtable) => {
+      setSprints(sprintsFromAirtable);
+    });
+    console.log(".......Res......", res);
+  };
+  const handleScheduleNewJobModal = () => {
+    setShowScheduleJobModal(!showScheduleJobModal);
+  };
+
+  function getMonthStartAndEndDates(monthName, year) {
+    const date = moment(`${monthName} ${year}`, "MMMM YYYY");
+    let newStrDate = date.startOf("month").toDate();
+    let newEndDate = date.endOf("month").toDate();
+    return [newStrDate, newEndDate];
+  }
+
+  function currentMonthsDates(targetMonth) {
+    if (targetMonth?.length > 0) {
+      const [newStrDate, newEndDate] = getMonthStartAndEndDates(
+        targetMonth,
+        moment().format("YYYY")
+      );
+      setDates({
+        firstDay: newStrDate,
+        lastDay: newEndDate,
+      });
+    }
+  }
+  const handleRangeChange = ({ start, end }) => {
+    return { start, end };
+  };
+
   return (
     <div className="my-calendar">
-      <div>
-        {/* Display a message indicating whether the shift key is being held down or not */}
-        <p>Alt key is {altKeyDown ? "down" : "up"}</p>
+      {/* <div> */}
+      {/* Display a message indicating whether the shift key is being held down or not */}
+      {/* <p>Alt key is {altKeyDown ? "down" : "up"}</p>
+      </div> */}
+      <Container className="calenderTopBar">
+        <Row className="container-calenderTopBar">
+          <div className="leftPart-calenderTopBar">
+            <div>
+              <p className="header__clientPageTitle">Scheduling</p>
+            </div>
+            <div>
+              {/* <button
+                className="btnScheduler-calenderTopBar"
+                onClick={() => setCurrentView("year")}
+              >
+                {moment().format("MMMM")}
+              </button> */}
+
+              <select
+                className="monthSelect-calenderTopBar"
+                onChange={(e) => {
+                  currentMonthsDates(e.target.value);
+                  setSelectedMonth(e.target.value);
+                }}
+                // defaultValue={}
+                value={selectedMonth}
+                // onClick={() => setCurrentView("month")}
+              >
+                {monthsArr.map((data) => {
+                  return <option value={data}> {data}</option>;
+                })}
+              </select>
+
+              <button
+                className="btnScheduler-calenderTopBar"
+                onClick={() => {
+                  // setCurrentView("year");
+                  // setCurrentView("month");
+                }}
+              >
+                {moment().format("YYYY")}
+              </button>
+              <button
+                className="btnScheduler-calenderTopBar"
+                onClick={() => {
+                  setCurrentView("month");
+                  setSelectedMonth(moment().format("MMMM"));
+                  currentMonthsDates(moment().format("MMMM"));
+                }}
+              >
+                Month
+              </button>
+
+              <button
+                className="btnScheduler-calenderTopBar"
+                onClick={() => {
+                  // setCurrentView("4 weeks");
+                  const today = new Date();
+                  const fourWeeksLater = moment(today).add(4, "weeks").toDate();
+                  setCurrentView("month");
+                  handleRangeChange(today, fourWeeksLater);
+                  // setDates({
+                  //   firstDay: today,
+                  //   lastDay: fourWeeksLater,
+                  // });
+                }}
+              >
+                4 Weeks
+              </button>
+              <button
+                className="btnScheduler-calenderTopBar"
+                onClick={() => {
+                  setCurrentView("week");
+                }}
+              >
+                Week
+              </button>
+              <button
+                className="btnScheduler-calenderTopBar"
+                onClick={() => {
+                  setCurrentView("day");
+                }}
+              >
+                Day
+              </button>
+            </div>
+          </div>
+          <div className="rightPart-calenderTopBar">
+            <button
+              className="btn-newClient-header__clientPage"
+              style={{ marginLeft: "0px" }}
+            >
+              <img src={plusIconWhite} alt="plus icon white" />
+              Out of office
+            </button>
+            <button
+              className="btn-newClient-header__clientPage"
+              onClick={handleScheduleNewJobModal}
+            >
+              <img src={plusIconWhite} alt="plus icon white" />
+              New job
+            </button>
+            <div
+              className="refreshIcon-header__clientPage"
+              onClick={() => setFilteredSprint([])}
+            >
+              <img src={refreshIcon} alt="refresh icon" />
+            </div>
+          </div>
+        </Row>
+      </Container>
+      <div className="mainCalenderContainer">
+        <LeftCalendarSec
+          employees={[...employees]}
+          currSprint={sprints}
+          setFilteredSprint={setFilteredSprint}
+        />
+
+        <DnDCalendar
+          localizer={localizer}
+          events={filteredSprint?.length > 0 ? filteredSprint : sprints}
+          showAllEvents={true}
+          components={{
+            month: {
+              event: (props) => {
+                return (
+                  <div className="cellEvent__myCalendar">
+                    <span>clients : {props?.event?.job?.client?.name}</span> |
+                    <span>
+                      {" "}
+                      Job code :
+                      {props?.event?.job?.job_code?.length > 0
+                        ? ` ${props?.event?.job?.job_code}`
+                        : " none"}{" "}
+                    </span>
+                    | <span> {props?.event?.employee?.firstName}</span>
+                  </div>
+                );
+              },
+              dateHeader: (props) => {
+                // console.log("propsoos", props.date);
+                const date = moment(props.date);
+                return (
+                  <div className="cellOptions__myCalendar">
+                    <p className="day-cellOptions__myCalendar">
+                      {date.format("dddd")}
+                    </p>
+                    <p className="date-cellOptions__myCalendar">
+                      {props.label}
+                    </p>
+                  </div>
+                );
+              },
+            },
+          }}
+          view={currentView}
+          date={(dates.firstDay, dates.lastDay)}
+          showMultiDayTimes
+          defaultView={"month"}
+          startAccessor={(e) => {
+            let startDate = new Date(e.start);
+            return startDate;
+            // if (!e) return "start";
+            // console.log({ e });
+            // let startDate = new Date(e.start);
+            // console.log({ startDate });
+            // return startDate;
+          }}
+          endAccessor={(e) => {
+            let addOneDay = new Date(e.end);
+            // addOneDay.setDate(addOneDay.getDate() - 1);
+            addOneDay.setDate(addOneDay.getDate() + 1);
+            return addOneDay;
+            //return endDate;
+            // if (!e) return "end";
+            // const addOneDay = new Date();
+            // let endDate = new Date(e.end);
+            // addOneDay.setDate(endDate.getDate() + 1);
+            // return addOneDay;
+          }}
+          min={dates.firstDay}
+          max={dates.lastDay}
+          selectable
+          onRangeChange={handleRangeChange}
+          onSelectSlot={handleSlotSelectEvent}
+          onSelectEvent={handleOnSelectEvent}
+          onEventDrop={moveEventHandler}
+          resizable
+          onEventResize={(e) => {
+            handleResizeEvent(e, e?.start, e?.end);
+          }}
+          longPressThreshold={10}
+          eventPropGetter={handleEventStyles}
+        />
       </div>
-      <DnDCalendar
-        localizer={localizer}
-        events={sprints}
-        views={["month", "week"]}
-        defaultView={"month"}
-        startAccessor={(e) => {
-          let startDate = new Date(e.start);
-          return startDate;
-          // if (!e) return "start";
-          // console.log({ e });
-          // let startDate = new Date(e.start);
-          // console.log({ startDate });
-          // return startDate;
-        }}
-        endAccessor={(e) => {
-          let addOneDay = new Date(e.end);
-          // addOneDay.setDate(addOneDay.getDate() - 1);
-          addOneDay.setDate(addOneDay.getDate() + 1);
-          return addOneDay;
-          //return endDate;
-          // if (!e) return "end";
-          // const addOneDay = new Date();
-          // let endDate = new Date(e.end);
-          // addOneDay.setDate(endDate.getDate() + 1);
-          // return addOneDay;
-        }}
-        allDayAccessor="allDay"
-        selectable
-        onSelectSlot={handleSlotSelectEvent}
-        onSelectEvent={hanldeOnSelectEvent}
-        onEventDrop={moveEventHandler}
-        resizable={false}
-        // onEventResize={resizeEventHandler}
-        // onSelecting={slot => false}
-        longPressThreshold={10}
-      />
       <AddEventModal
         modalState={modalState}
         startDate={startDate}
@@ -262,10 +529,12 @@ const BasicCalendar = () => {
         setModalState={setModalState}
         handleClose={handleClose}
         handleDeleteSprint={handleDeleteSprint}
+        logedUser={logedUser}
       />
       <EditModal
         modalState={modalState}
         sprint={selectedSprint}
+        sprints={sprints}
         startDate={startDate}
         endDate={endDate}
         clients={clients}
@@ -273,6 +542,16 @@ const BasicCalendar = () => {
         setModalState={setModalState}
         handleClose={handleClose}
         handleEditSprintAndJob={handleEditSprintAndJob}
+      />
+      <ScheduleNewJob
+        showScheduleJobModal={showScheduleJobModal}
+        setShowScheduleJobModal={setShowScheduleJobModal}
+        clients={clients}
+        sprint={sprints}
+        startDate={startDate}
+        endDate={endDate}
+        employees={employees}
+        handleScheduleJob={handleScheduleJob}
       />
     </div>
   );

@@ -7,6 +7,9 @@ import MyCalendar from "./components/MyCalendar";
 import SideNavBar from "./components/SideNavBar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ClientPage from "./components/ClientPage";
+import SpecificClient from "./components/SpecificClient";
+import SignIn from "./components/SignIn";
+import { useEffect } from "react";
 
 function App() {
   //set theme by navbar and reflect it in app style
@@ -31,10 +34,16 @@ function App() {
     }
   };
 
+  const [userDetails, setUserDetails] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem("userCred", "");
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="app" style={myStyle}>
-        <SideNavBar toggleStyle={toggleStyle} />
+        <SideNavBar userDetails={userDetails} />
         <Routes>
           <Route
             path="/"
@@ -42,6 +51,16 @@ function App() {
           />
 
           <Route path="/client" element={<ClientPage />} />
+          <Route path="/client/:id" element={<SpecificClient />} />
+          <Route
+            path="/signin"
+            element={
+              <SignIn
+                setUserDetails={setUserDetails}
+                userDetails={userDetails}
+              />
+            }
+          />
         </Routes>
       </div>
     </BrowserRouter>
