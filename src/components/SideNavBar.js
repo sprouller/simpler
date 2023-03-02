@@ -16,7 +16,7 @@ const Navbar = ({ userDetails }) => {
   const [cred, setCred] = useState({});
 
   const handleCredDetails = () => {
-    setCred(JSON.parse(localStorage.getItem("userCred")));
+    setCred(localStorage?.getItem("userCred"));
   };
   useEffect(() => {
     handleCredDetails();
@@ -105,9 +105,9 @@ const Navbar = ({ userDetails }) => {
         </div>
         <div className="userDetailsCont__sideBar">
           <Link to="/signin" style={{ width: "fit-content" }}>
-            {Object.keys(cred)?.length > 0 ? (
+            {Object?.keys(cred)?.length > 1 ? (
               <div className="userDetails__sideBar">
-                <p>{cred?.email?.slice(0, 1)}</p>
+                <p>{JSON.parse(cred)?.email?.slice(0, 1)}</p>
               </div>
             ) : (
               <img

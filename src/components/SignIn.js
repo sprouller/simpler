@@ -1,15 +1,26 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchCred } from "../controller/Airtable";
-const SignIn = ({ setUserDetails }) => {
+import {
+  fetchCred,
+  fetchSprints,
+  fetchClients,
+  fetchEmployees,
+} from "../controller/Airtable";
+import CompProfile from "./CompProfile";
+const SignIn = ({ setUserDetails, userDetails, allClt }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [cred, setCred] = useState([]);
+  const [client, setAllClt] = useState(null);
   const [currUser, setCurrUser] = useState({});
+  const [sprints, setSprints] = useState([]);
+  const [empData, setEmpData] = useState([]);
   const navigate = useNavigate();
+  console.log("signinAllclt", allClt);
+  // const userEmail = JSON.parse(localStorage.getItem("userCred"))?.email;
 
   const handleSignIn = (e) => {
     e.preventDefault();
@@ -23,7 +34,8 @@ const SignIn = ({ setUserDetails }) => {
             JSON.stringify({
               email: email,
               pass: pass,
-              type: data.type,
+              type: data?.type,
+              clientDetails: data?.clientDetails,
             })
           );
           setEmail("");
@@ -39,36 +51,53 @@ const SignIn = ({ setUserDetails }) => {
   };
 
   const handleLogOut = () => {
-    localStorage.setItem("userCred", JSON.stringify(""));
-    setCurrUser(JSON.parse(localStorage.getItem("userCred")));
+    localStorage.setItem("userCred", "");
+    setCurrUser(localStorage.getItem("userCred"));
     setUserDetails(false);
     navigate("/");
   };
 
   useEffect(() => {
-    setCurrUser(JSON.parse(localStorage.getItem("userCred")));
-  }, [email, pass]);
+    setCurrUser(localStorage.getItem("userCred"));
+    fetchSprints()
+      .then((data) => setSprints(data))
+      .catch((e) => console.log(e));
+    fetchCred()
+      .then((eachCred) => {
+        setCred(eachCred);
+      })
+      .catch((e) => console.log("cred not available"));
 
-  useEffect(() => {
-    fetchCred().then((eachCred) => {
-      setCred(eachCred);
+    fetchEmployees()
+      .then((eachCred) => {
+        setEmpData(eachCred);
+      })
+      .catch((e) => console.log("cred not available"));
+
+    fetchClients().then((clientsFromAirtable) => {
+      setAllClt(clientsFromAirtable);
+      // setLoaded(!loaded);
     });
   }, []);
+  console.log(sprints);
 
-  console.log("outer =>", error);
-  console.log("curr", currUser);
+  console.log("curruser", currUser);
+
   return (
     <div className="my-calendar signIn">
-      {Object.keys(currUser)?.length > 0 ? (
-        <div className="loggedInDetailsCont__signIn">
-          <p>{currUser?.email}</p>
-          <button
-            className="button__signIn btn-newClient-header__clientPage"
-            onClick={handleLogOut}
-          >
-            logout
-          </button>
-        </div>
+      {Object?.keys(currUser)?.length > 0 ? (
+        <>
+          {sprints?.length > 0 && client && (
+            <CompProfile
+              sprints={sprints}
+              userDetails={userDetails}
+              handleLogOut={handleLogOut}
+              clients={client}
+              cred={currUser}
+              empData={empData}
+            />
+          )}
+        </>
       ) : (
         <form onSubmit={(e) => handleSignIn(e)}>
           {success?.length > 0 ? (

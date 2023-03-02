@@ -23,12 +23,28 @@ import {
 } from "../controller/Airtable";
 import LeftCalendarSec from "./LeftCalendarSec";
 import ScheduleNewJob from "./ScheduleNewJob";
+import { useCallback } from "react";
 
 moment.tz.setDefault("Etc/GMT");
 const localizer = momentLocalizer(moment);
 localizer.segmentOffset = 0;
 
 const DnDCalendar = withDragAndDrop(Calendar);
+
+const monthsArr = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 moment.locale("ko", {
   week: {
@@ -37,7 +53,7 @@ moment.locale("ko", {
   },
 });
 // react BasicCalendar component
-const BasicCalendar = () => {
+const BasicCalendar = ({ handleClient }) => {
   const [sprints, setSprints] = useState([]);
   const [clients, setClients] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -56,6 +72,7 @@ const BasicCalendar = () => {
   const [filteredSprint, setFilteredSprint] = useState([]);
   const [showScheduleJobModal, setShowScheduleJobModal] = useState(false);
   const [logedUser, setLoggedUser] = useState({});
+  const [selectedMonth, setSelectedMonth] = useState(moment().format("MMMM"));
   console.log("date.....", startDate, endDate);
 
   useEffect(() => {
@@ -68,6 +85,7 @@ const BasicCalendar = () => {
     fetchEmployees().then((employeesFromAirtable) => {
       setEmployees(employeesFromAirtable);
     });
+
     // localStorage.getItem()
     // setLoggedUser(JSON.parse(localStorage?.getItem("userCred")));
     currentMonthsDates();
@@ -214,7 +232,7 @@ const BasicCalendar = () => {
   // };
 
   //on select event handler
-  const hanldeOnSelectEvent = (e) => {
+  const handleOnSelectEvent = (e) => {
     console.log({ e });
     setStartDate(new Date(`${e.start}`));
     setEndDate(new Date(`${e.end}`));
@@ -231,13 +249,14 @@ const BasicCalendar = () => {
   console.log({ selectedSprint });
 
   const handleEventStyles = (event) => {
+    const bgColor = event?.employee?.colour;
     const style = {
       backgroundColor: event?.employee?.colour,
       borderRadius: "10px",
-      color: "white",
+      color: bgColor.slice(0, 6) === ("#FFFFF" || "#fffff") ? "#000" : "#fff",
       border: "0px",
       display: "block",
-      width: " 98%",
+      width: "97%",
       marginLeft: "5px",
       hover: {
         visbility: "hidden",
@@ -272,31 +291,29 @@ const BasicCalendar = () => {
   const handleScheduleNewJobModal = () => {
     setShowScheduleJobModal(!showScheduleJobModal);
   };
-  function currentMonthsDates() {
-    var date = new Date();
-    var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-    var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    const dateTime1 = moment(firstDay).format("YYYY-MM-DD");
-    const dateTime2 = moment(lastDay).format("YYYY-MM-DD");
-    setDates({
-      firstDay: dateTime1,
-      lastDay: dateTime2,
-    });
+
+  function getMonthStartAndEndDates(monthName, year) {
+    const date = moment(`${monthName} ${year}`, "MMMM YYYY");
+    let newStrDate = date.startOf("month").toDate();
+    let newEndDate = date.endOf("month").toDate();
+    return [newStrDate, newEndDate];
   }
 
-  // const MonthView = ({ date, ...props }) => {
-  //   const start = moment(date).startOf("month");
-  //   const end = moment(date).startOf("month").add(27, "days");
-  //   return (
-  //     <BigCalendar
-  //       {...props}
-  //       date={date}
-  //       view={"month"}
-  //       startAccessor={() => start.toDate()}
-  //       endAccessor={() => end.toDate()}
-  //     />
-  //   );
-  // };
+  function currentMonthsDates(targetMonth) {
+    if (targetMonth?.length > 0) {
+      const [newStrDate, newEndDate] = getMonthStartAndEndDates(
+        targetMonth,
+        moment().format("YYYY")
+      );
+      setDates({
+        firstDay: newStrDate,
+        lastDay: newEndDate,
+      });
+    }
+  }
+  const handleRangeChange = ({ start, end }) => {
+    return { start, end };
+  };
 
   return (
     <div className="my-calendar">
@@ -311,39 +328,77 @@ const BasicCalendar = () => {
               <p className="header__clientPageTitle">Scheduling</p>
             </div>
             <div>
-              <button
+              {/* <button
                 className="btnScheduler-calenderTopBar"
                 onClick={() => setCurrentView("year")}
               >
                 {moment().format("MMMM")}
-              </button>
-              <button
-                className="btnScheduler-calenderTopBar"
-                onClick={() => setCurrentView("year")}
+              </button> */}
+
+              <select
+                className="monthSelect-calenderTopBar"
+                onChange={(e) => {
+                  currentMonthsDates(e.target.value);
+                  setSelectedMonth(e.target.value);
+                }}
+                // defaultValue={}
+                value={selectedMonth}
+                // onClick={() => setCurrentView("month")}
               >
-                Year
+                {monthsArr.map((data) => {
+                  return <option value={data}> {data}</option>;
+                })}
+              </select>
+
+              <button
+                className="btnScheduler-calenderTopBar"
+                onClick={() => {
+                  // setCurrentView("year");
+                  // setCurrentView("month");
+                }}
+              >
+                {moment().format("YYYY")}
               </button>
               <button
                 className="btnScheduler-calenderTopBar"
-                onClick={() => setCurrentView("month")}
+                onClick={() => {
+                  setCurrentView("month");
+                  setSelectedMonth(moment().format("MMMM"));
+                  currentMonthsDates(moment().format("MMMM"));
+                }}
               >
                 Month
               </button>
+
               <button
                 className="btnScheduler-calenderTopBar"
-                onClick={() => setCurrentView("4 weeks")}
+                onClick={() => {
+                  // setCurrentView("4 weeks");
+                  const today = new Date();
+                  const fourWeeksLater = moment(today).add(4, "weeks").toDate();
+                  setCurrentView("month");
+                  handleRangeChange(today, fourWeeksLater);
+                  // setDates({
+                  //   firstDay: today,
+                  //   lastDay: fourWeeksLater,
+                  // });
+                }}
               >
-                4 Week
+                4 Weeks
               </button>
               <button
                 className="btnScheduler-calenderTopBar"
-                onClick={() => setCurrentView("week")}
+                onClick={() => {
+                  setCurrentView("week");
+                }}
               >
                 Week
               </button>
               <button
                 className="btnScheduler-calenderTopBar"
-                onClick={() => setCurrentView("day")}
+                onClick={() => {
+                  setCurrentView("day");
+                }}
               >
                 Day
               </button>
@@ -383,10 +438,6 @@ const BasicCalendar = () => {
         <DnDCalendar
           localizer={localizer}
           events={filteredSprint?.length > 0 ? filteredSprint : sprints}
-          // min={dates.firstDay}
-          // max={dates.lastDay}
-          // views={["month", "week"]}
-          // onRangeChange={}
           showAllEvents={true}
           components={{
             month: {
@@ -396,10 +447,10 @@ const BasicCalendar = () => {
                     <span>clients : {props?.event?.job?.client?.name}</span> |
                     <span>
                       {" "}
-                      Job code :{" "}
+                      Job code :
                       {props?.event?.job?.job_code?.length > 0
-                        ? props?.event?.job?.job_code
-                        : "none"}{" "}
+                        ? ` ${props?.event?.job?.job_code}`
+                        : " none"}{" "}
                     </span>
                     | <span> {props?.event?.employee?.firstName}</span>
                   </div>
@@ -422,7 +473,7 @@ const BasicCalendar = () => {
             },
           }}
           view={currentView}
-          date={new Date()}
+          date={(dates.firstDay, dates.lastDay)}
           showMultiDayTimes
           defaultView={"month"}
           startAccessor={(e) => {
@@ -446,21 +497,19 @@ const BasicCalendar = () => {
             // addOneDay.setDate(endDate.getDate() + 1);
             // return addOneDay;
           }}
-          // allDayAccessor="allDay"
+          min={dates.firstDay}
+          max={dates.lastDay}
           selectable
+          onRangeChange={handleRangeChange}
           onSelectSlot={handleSlotSelectEvent}
-          onSelectEvent={hanldeOnSelectEvent}
+          onSelectEvent={handleOnSelectEvent}
           onEventDrop={moveEventHandler}
           resizable
           onEventResize={(e) => {
             handleResizeEvent(e, e?.start, e?.end);
           }}
-          // onEventResize={resizeEventHandler}
-          // onSelecting={slot => false}
           longPressThreshold={10}
           eventPropGetter={handleEventStyles}
-          // dayLayoutAlgorithm={(e) => console.log("dayLayout", e)}
-          // resizableAccessor
         />
       </div>
       <AddEventModal

@@ -37,7 +37,7 @@ body {
   width: 5px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: var(--theme-color);
+  background-color: var(--active-nav-text-color);
   border-radius: 30px;
 }
 
@@ -257,6 +257,13 @@ body {
   white-space: pre;
 }
 
+.monthSelect-calenderTopBar {
+  outline: none;
+  border: none;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
 .btnScheduler-calenderTopBar {
   padding: 0;
   background: none;
@@ -288,6 +295,9 @@ body {
 .rbc-addons-dnd {
   width: 100%;
 }
+.rbc-row {
+  padding-right: 5px;
+}
 .rbc-month-view {
   border-radius: 20px;
   display: block;
@@ -298,9 +308,7 @@ body {
   background-color: #ededed;
   border-radius: 10px;
 }
-.rbc-month-view::-webkit-scrollbar-thumb {
-  background-color: var(--active-nav-text-color);
-}
+
 .rbc-month-row {
   height: fit-content;
   padding: 10px 0;
@@ -319,6 +327,12 @@ body {
 }
 .rbc-row-bg {
   border: none;
+  padding-right: 5px;
+}
+
+.rbc-row-bg > div:last-child {
+  margin-right: 0;
+  padding-left: 7px;
 }
 
 .rbc-row-content {
@@ -326,6 +340,7 @@ body {
   position: relative;
   padding-top: 24px;
   padding-bottom: 24px;
+  padding-right: 2px;
 }
 .rbc-row-content > div:first-child {
   position: absolute;
@@ -667,9 +682,7 @@ body {
   background-color: #ededed;
   border-radius: 10px;
 }
-.dataContainer-detailsContainer__clientPage::-webkit-scrollbar-thumb {
-  background-color: var(--active-nav-text-color);
-}
+
 .data-detailsContainer__clientPage {
   display: flex;
   align-items: center;
@@ -710,9 +723,7 @@ body {
   background-color: #ededed;
   border-radius: 10px;
 }
-.tableCont__specificClient::-webkit-scrollbar-thumb {
-  background-color: var(--active-nav-text-color);
-}
+
 .table__specificClient {
   width: 99%;
   border-collapse: separate;
@@ -819,4 +830,142 @@ th {
 }
 .userDetails__sideBar {
   width: fit-content;
+}
+
+.compProfile {
+  padding: 0;
+}
+.header__compProfile {
+  margin: 0;
+}
+.header__compProfile a {
+  text-decoration: none;
+}
+.header__compProfile a p {
+  margin: 0 10px 0 0;
+}
+.empCont__CompProfile {
+  position: relative;
+  overflow: scroll;
+  max-height: 93%;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.emp-empCont__CompProfile {
+  display: flex;
+  align-items: center;
+  margin: 12px;
+  position: relative;
+  cursor: pointer;
+  width: 152px;
+  max-width: 255px;
+}
+.emp-empCont__CompProfile::after {
+  content: ">";
+  position: absolute;
+  right: 4px;
+  font-size: 20px;
+  color: inherit;
+  top: 10px;
+  font-weight: 100;
+}
+
+.emp-empCont__CompProfile img {
+  width: 53px;
+  height: 54px;
+  object-fit: cover;
+  border: 2px solid var(--active-nav-text-color);
+  border-radius: 50%;
+}
+
+.details-emp-empCont__CompProfile {
+  margin-right: 15px;
+}
+.details-emp-empCont__CompProfile p {
+  font-size: 14px;
+  line-height: 10px;
+  margin-left: 10px;
+  width: 91%;
+  line-height: 16px;
+  font-family: sans-serif;
+  font-weight: 100;
+}
+
+.rightPart-header__addResModal {
+  display: flex;
+  align-items: center;
+  width: 44%;
+  justify-content: space-between;
+}
+
+.colorCont__addResModal {
+  align-items: center;
+  justify-content: center;
+}
+.colorCont__addResModal p {
+  font-size: 12px;
+  margin: 0;
+  margin-right: 5px;
+}
+.colorInp__addResModal {
+  width: 20px;
+  height: 20px;
+  outline: none;
+  border: none;
+}
+.personCont__empProfile {
+  background-color: #ededed;
+  display: flex;
+  border-radius: 10px;
+  flex-direction: column;
+}
+.common-personCont__empProfile,
+.Cont__empProfile,
+.profile-personCont__empProfile {
+  display: flex;
+}
+.profile-personCont__empProfile {
+  padding: 10px;
+}
+.profile-personCont__empProfile h2 {
+  font-size: 25px;
+  font-family: "sofia-pro", sans-serif;
+  margin-bottom: 10px;
+}
+.profile-personCont__empProfile h5 {
+  font-size: 20px;
+  font-family: "sofia-pro", sans-serif;
+  margin-bottom: 15px;
+}
+.personImage {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0px 17px 0 10px;
+  border: 2px solid var(--active-nav-text-color);
+}
+.commonCont-personCont__empProfile {
+  margin-right: 23px;
+}
+.common-personCont__empProfile img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+.common-personCont__empProfile p {
+  font-size: 12px;
+  margin-left: 10px;
+  margin-bottom: 15px;
+}
+.disCont-personCont__empProfile {
+  padding: 12px;
+  border-top: 1px solid var(--normal-nav-text-color);
+}
+.disCont-personCont__empProfile p {
+  font-size: 12px;
+  color: var(--normal-nav-text-color);
 }

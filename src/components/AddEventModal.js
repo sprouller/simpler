@@ -115,10 +115,10 @@ function AddEventModal({
                   >
                     <option>Select Client</option>
                     {clients &&
-                      clients.map((client) => {
+                      clients?.map((client) => {
                         return (
-                          <option key={client.id} value={client.id}>
-                            {client.name}
+                          <option key={client?.id} value={client?.id}>
+                            {client?.name}
                           </option>
                         );
                       })}
@@ -137,15 +137,25 @@ function AddEventModal({
                   >
                     <option>Assign to Sub Brand</option>;
                     {clientId &&
-                      clients.map((clientData) => {
-                        if (clientData.id === clientId) {
-                          return clientData.subbrand.map((subData, index) => {
-                            return (
-                              <option key={index} value={subData}>
-                                {subData}
-                              </option>
+                      clients?.map((clientData, index) => {
+                        if (clientData?.subbrand?.length > 0) {
+                          if (clientData.id === clientId) {
+                            return clientData?.subbrand?.map(
+                              (subData, index) => {
+                                return (
+                                  <option key={index} value={subData}>
+                                    {subData}
+                                  </option>
+                                );
+                              }
                             );
-                          });
+                          }
+                        } else {
+                          return (
+                            <option key={index} value="None">
+                              None
+                            </option>
+                          );
                         }
                       })}
                   </Form.Select>

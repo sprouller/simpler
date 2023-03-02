@@ -54,10 +54,11 @@ export default function LeftCalendarSec({
         />
         <p className="text-resources_firstChild_leftMenu">Resources</p>
         <div className="allClient-firstChild_leftMenu">
-          {employees?.map((emp) => {
+          {employees?.map((emp, index) => {
+            console.log(emp);
             return (
               <div
-                key={emp?.id}
+                key={index}
                 style={{ backgroundColor: `${emp?.colour}` }}
                 className="empList_firstChild_leftMenu"
                 onClick={() => {

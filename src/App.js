@@ -50,7 +50,12 @@ function App() {
           <Route path="/client/:id" element={<SpecificClient />} />
           <Route
             path="/signin"
-            element={<SignIn setUserDetails={setUserDetails} />}
+            element={
+              <SignIn
+                setUserDetails={setUserDetails}
+                userDetails={userDetails}
+              />
+            }
           />
         </Routes>
       </div>

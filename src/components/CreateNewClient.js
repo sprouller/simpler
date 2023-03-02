@@ -4,7 +4,6 @@ import plusIconWhite from "../images/plusIconWhite.svg";
 import minusIcon from "../images/minus-white.svg";
 import { Col, Form, Modal, ModalBody, ModalHeader, Row } from "react-bootstrap";
 import { addNewClient } from "../controller/Airtable";
-import moment from "moment-timezone";
 
 function CreateNewClient({ show, setShow }) {
   const [activeBtn, setActiveBtn] = useState(false);
