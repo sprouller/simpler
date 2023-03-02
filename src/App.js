@@ -36,6 +36,10 @@ function App() {
 
   const [userDetails, setUserDetails] = useState(false);
 
+  useEffect(() => {
+    localStorage.setItem("userCred", "");
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="app" style={myStyle}>
