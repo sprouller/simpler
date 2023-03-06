@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { fetchClients } from "../controller/Airtable";
+import { fetchClients, fetchJobs } from "../controller/Airtable";
 import flower from "../images/flower-green.svg";
 import pdf from "../images/pdf.svg";
 import refreshIcon from "../images/refreshIcon.svg";
