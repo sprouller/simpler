@@ -80,6 +80,7 @@ function MyModal({
               <Form.Label>Start Date</Form.Label>
               <Form.Control
                 type="text"
+                className="commonInpStyleNewJob"
                 onFocus={(e) => (e.target.type = "date")}
                 onChange={(e) => {
                   let newStartDate = getStartDateText(e.target.value);

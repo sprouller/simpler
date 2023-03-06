@@ -6,7 +6,7 @@ import "../App.css";
 
 // Utilities for reference perpose
 // const utilitiesArr = ["Holiday", "Work from home", "Pencilled"];
-const utilitiesArr = [
+export const utilitiesArr = [
   {
     id: "01",
     name: "Holiday",
@@ -14,7 +14,7 @@ const utilitiesArr = [
   },
   {
     id: "02",
-    name: "Work from home",
+    name: "work from home",
     colour: "#FF5733",
   },
   {
@@ -28,6 +28,7 @@ export default function LeftCalendarSec({
   employees,
   currSprint,
   setFilteredSprint,
+  handleUtilData,
 }) {
   const [eyeId, setEyeId] = useState("");
   const handleClick = (empId) => {
@@ -37,6 +38,7 @@ export default function LeftCalendarSec({
 
     allFilterSprint?.length > 0 && setFilteredSprint(allFilterSprint);
   };
+
   useEffect(() => {}, [eyeId]);
 
   return (
@@ -55,7 +57,6 @@ export default function LeftCalendarSec({
         <p className="text-resources_firstChild_leftMenu">Resources</p>
         <div className="allClient-firstChild_leftMenu">
           {employees?.map((emp, index) => {
-            console.log(emp);
             return (
               <div
                 key={index}
@@ -97,6 +98,9 @@ export default function LeftCalendarSec({
                 key={utility?.id}
                 style={{ backgroundColor: `${utility?.colour}` }}
                 className="empList_firstChild_leftMenu"
+                onClick={() => {
+                  handleUtilData(utility);
+                }}
               >
                 <p>{utility?.name}</p>
               </div>

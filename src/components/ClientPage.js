@@ -4,7 +4,7 @@ import refreshIcon from "../images/refreshIcon.svg";
 import searchIcon from "../images/searchIcon.svg";
 import defaultImage from "../images/flower-green.svg";
 import { useNavigate } from "react-router-dom";
-import { fetchClients } from "../controller/Airtable";
+import { fetchClients, fetchJobs } from "../controller/Airtable";
 import "../App.css";
 import CreateNewClient from "./CreateNewClient";
 
