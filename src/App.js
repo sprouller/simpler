@@ -10,6 +10,7 @@ import ClientPage from "./components/ClientPage";
 import SpecificClient from "./components/SpecificClient";
 import SignIn from "./components/SignIn";
 import { useEffect } from "react";
+import { fetchJobs } from "./controller/Airtable";
 
 function App() {
   //set theme by navbar and reflect it in app style
@@ -35,33 +36,68 @@ function App() {
   };
 
   const [userDetails, setUserDetails] = useState(false);
+  const [cred, setCred] = useState(null);
+  const [allJobs, setAllJobs] = useState([]);
+
+  const fetchAllJobs = () => {
+    fetchJobs()
+      .then((jobs) => {
+        setAllJobs(jobs);
+      })
+      .catch((e) => console.log(e));
+  };
 
   useEffect(() => {
-    localStorage.setItem("userCred", "");
+    const pastCred = localStorage.getItem("userCred");
+    //if (pastCred?.length > 0) {
+      setCred(pastCred);
+    // } else {
+    //   const newCred = localStorage.setItem("userCred", "");
+    //   setCred(newCred);
+    // }
+    fetchAllJobs();
   }, []);
 
   return (
     <BrowserRouter>
       <div className="app" style={myStyle}>
         <SideNavBar userDetails={userDetails} />
-        <Routes>
-          <Route
-            path="/"
-            element={<MyCalendar className="p-4" style={myStyle} />}
-          />
+        {cred === undefined ? (
+          <Routes>
+            <Route
+              path={"*"}
+              element={
+                <SignIn
+                  setUserDetails={setUserDetails}
+                  userDetails={userDetails}
+                />
+              }
+            />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route
+              path="/"
+              element={<MyCalendar className="p-4" style={myStyle} />}
+            />
 
-          <Route path="/client" element={<ClientPage />} />
-          <Route path="/client/:id" element={<SpecificClient />} />
-          <Route
-            path="/signin"
-            element={
-              <SignIn
-                setUserDetails={setUserDetails}
-                userDetails={userDetails}
-              />
-            }
-          />
-        </Routes>
+            <Route path="/client" element={<ClientPage />} />
+
+            <Route
+              path="/client/:id"
+              element={<SpecificClient allJobs={allJobs} />}
+            />
+            <Route
+              path="/signin"
+              element={
+                <SignIn
+                  setUserDetails={setUserDetails}
+                  userDetails={userDetails}
+                />
+              }
+            />
+          </Routes>
+        )}
       </div>
     </BrowserRouter>
   );

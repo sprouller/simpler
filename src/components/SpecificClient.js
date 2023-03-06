@@ -1,53 +1,68 @@
+import moment from "moment-timezone";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { fetchClients } from "../controller/Airtable";
+import { fetchClients, fetchJobs } from "../controller/Airtable";
 import flower from "../images/flower-green.svg";
 import pdf from "../images/pdf.svg";
 import refreshIcon from "../images/refreshIcon.svg";
 import searchIcon from "../images/searchIcon.svg";
+import Loader from "./Loader";
 
-function SpecificClient() {
+function SpecificClient({ allJobs }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [clt, setClt] = useState([]);
-  console.log(clt);
-
+  const [jobWithClt, setJobWithClt] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
   const getDetails = async () => {
     fetchClients()
       .then((data) => {
-        let fileteredData = data.filter(
+        let filteredData = data.filter(
           (eachClt) => eachClt.id === location.pathname.slice(8)
         );
-        setClt(fileteredData);
+        setClt(filteredData[0]);
+        setIsLoaded(true);
       })
       .catch((e) => console.log(e));
+  };
+
+  const filterJobsWithClt = () => {
+    isLoaded &&
+      clt?.jobs?.forEach((jobId) => {
+        allJobs?.forEach((singleJob) => {
+          if (jobId === singleJob?.id) {
+            setJobWithClt((prevState) => [...prevState, singleJob]);
+          }
+        });
+      });
   };
 
   useEffect(() => {
     getDetails();
   }, []);
+
+  useEffect(() => {
+    isLoaded === true && filterJobsWithClt();
+  }, [isLoaded]);
+
+  console.log("jwc", jobWithClt);
   return (
     <>
-      {clt.length > 0 && (
+      {jobWithClt?.length > 0 ? (
         <div className="clientPage">
           <div className="header__clientPage">
             <div className="d-flex" style={{ alignItems: "center" }}>
-              {clt[0]?.comp_logo ? (
+              {clt?.comp_logo ? (
                 <img
                   width="30px"
                   height="30px"
-                  src={clt[0]?.comp_logo[0].url}
-                  alt={clt[0].name}
+                  src={clt?.comp_logo[0]?.url}
+                  alt={clt.name}
                 />
               ) : (
-                <img
-                  width="30px"
-                  height="30px"
-                  src={flower}
-                  alt={clt[0].name}
-                />
+                <img width="30px" height="30px" src={flower} alt={clt.name} />
               )}
-              <p className="mx-3 header__clientPageTitle">{clt[0].name}</p>
+              <p className="mx-3 header__clientPageTitle">{clt.name}</p>
             </div>
             <div className="rightPart-header__clientPage">
               <button
@@ -73,7 +88,10 @@ function SpecificClient() {
 
           <div
             className="detailsContainer__clientPage"
-            style={{ boxShadow: "6px 0px 12px #e7e7e7", borderRadius: "20px" }}
+            style={{
+              boxShadow: "6px 0px 12px #e7e7e7",
+              borderRadius: "20px",
+            }}
           >
             <div
               className="projectBased-detailsContainer__clientPage commonContainer-detailsContainer__clientPage"
@@ -102,13 +120,35 @@ function SpecificClient() {
                     <th>Time allocated (hrs)</th>
                   </tr>
                   {/* below data is dynamic  */}
-                  <tr>
-                    <td>ZOO001</td>
-                    <td>sketch design</td>
-                    <td>10/10</td>
-                    <td>6</td>
-                    <td>25</td>
-                  </tr>
+
+                  {jobWithClt?.map((eachJob, index) => {
+                    let convertDate = moment
+                      .utc(eachJob?.created_at)
+                      .format("DD/MM/YY");
+                    return (
+                      <tr key={index}>
+                        <td>
+                          {eachJob?.job_code?.length > 0
+                            ? eachJob?.job_code
+                            : "NAMXXX"}
+                        </td>
+                        <td>
+                          {eachJob?.job_name?.length > 0
+                            ? eachJob?.job_name
+                            : "XXXXX"}
+                        </td>
+                        <td>
+                          {convertDate?.length > 0 ? convertDate : "DD/MM/YY"}
+                        </td>
+                        <td>{"XX"}</td>
+                        <td>
+                          {eachJob?.time_allocated?.length > 0
+                            ? eachJob?.time_allocated
+                            : "XX"}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </table>
               </div>
             </div>
@@ -137,16 +177,37 @@ function SpecificClient() {
                     <th>cost</th>
                   </tr>
                   {/* below data is dynamic  */}
-                  <tr>
-                    <td>ZOO001</td>
-                    <td>sketch design</td>
-                    <td>100</td>
-                  </tr>
+                  {jobWithClt?.map((eachJob, index) => {
+                    let convertDate = moment
+                      .utc(eachJob?.created_at)
+                      .format("DD/MM/YY");
+                    return (
+                      <tr key={index}>
+                        <td>
+                          {eachJob?.description?.length > 0
+                            ? eachJob?.description
+                            : "XXXXX"}
+                        </td>
+                        <td>
+                          {convertDate?.length > 0 ? convertDate : "DD/MM/YY"}
+                        </td>
+                        <td>
+                          {eachJob?.Third_party_cost?.length > 0
+                            ? `£ ${eachJob?.Third_party_cost}`
+                            : "£ XX"}
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  <tr></tr>
                 </table>
               </div>
             </div>
           </div>
         </div>
+      ) : (
+        <Loader />
       )}
     </>
   );

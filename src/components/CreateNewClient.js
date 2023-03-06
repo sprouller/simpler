@@ -3,9 +3,10 @@ import closeIcon from "../images/closeIcon.svg";
 import plusIconWhite from "../images/plusIconWhite.svg";
 import minusIcon from "../images/minus-white.svg";
 import { Col, Form, Modal, ModalBody, ModalHeader, Row } from "react-bootstrap";
-import { addNewClient } from "../controller/Airtable";
+import { addNewClient, editClientToAirtable } from "../controller/Airtable";
+import moment from "moment-timezone";
 
-function CreateNewClient({ show, setShow }) {
+function CreateNewClient({ show, setShow, jobs }) {
   const [activeBtn, setActiveBtn] = useState(false);
   const [clientType, setClientType] = useState("Project based");
   const [subClientArr, setSubClientArr] = useState([]);
@@ -13,6 +14,7 @@ function CreateNewClient({ show, setShow }) {
   const [subClient, setSubClient] = useState("");
   const [description, setDescription] = useState("");
   const [compLogo, setCompLogo] = useState({});
+  const [cltId, setCltId] = useState("");
 
   const handleDelete = (eachClient) => {
     const filterArr = subClientArr.filter((data, index) => data !== eachClient);
@@ -33,18 +35,35 @@ function CreateNewClient({ show, setShow }) {
           <button
             className="btn-newClient-header__clientPage m-3"
             onClick={() => {
-              // today = moment.utc(today).format("DD/MM/YYYY");
+              let today = new Date();
+              today = moment.utc(today).format("DD/MM/YYYY");
 
-              const clientDetails = {
-                clientType,
-                // subClientArr,
-                description,
-                client,
-                // createdAt: new Date(),
-                // compLogo,
-              };
-              if (subClientArr && description && clientType && client)
-                addNewClient(clientDetails);
+              if (subClientArr && description && clientType && client) {
+                let subCltArr = [];
+                let clientDetails;
+                subClientArr.forEach((data) => {
+                  clientDetails = {
+                    clientType,
+                    subClient: subCltArr.push(data),
+                    description,
+                    client,
+                    createdAt: today,
+                    // compLogo,
+                  };
+                });
+                clientDetails = {
+                  clientType,
+                  subClient: subCltArr,
+                  description,
+                  client,
+                  createdAt: today,
+                  // compLogo,
+                };
+
+                let cltId = addNewClient(clientDetails);
+                console.log(cltId);
+              }
+
               setCompLogo({});
               setClient("");
               setSubClientArr([]);

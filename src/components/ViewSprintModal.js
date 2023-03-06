@@ -175,6 +175,7 @@ function ViewSprintModal({
                         <strong>Employee:</strong>
                       </Form.Label>
                       <Form.Select
+                        className="commonInpStyleNewJob"
                         disabled
                         defaultValue={sprint.employee.id}
                         onChange={(e) => {
@@ -197,6 +198,7 @@ function ViewSprintModal({
                         <strong>Date:</strong>
                       </Form.Label>
                       <Form.Control
+                        className="commonInpStyleNewJob"
                         type="text"
                         onFocus={(e) => (e.target.type = "date")}
                         onChange={(e) => {
@@ -211,6 +213,7 @@ function ViewSprintModal({
                         <strong>Hours:</strong>
                       </Form.Label>
                       <Form.Control
+                        className="commonInpStyleNewJob"
                         type="number"
                         defaultValue={hours}
                         onChange={(e) => {
