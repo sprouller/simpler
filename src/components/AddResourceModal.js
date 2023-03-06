@@ -1,13 +1,14 @@
+import moment from "moment-timezone";
 import React, { useEffect, useState } from "react";
 import { Col, Modal, ModalBody, ModalHeader, Row, Form } from "react-bootstrap";
 import { addNewEmployee } from "../controller/Airtable";
 import closeIcon from "../images/closeIcon.svg";
-import { ourEmpData } from "./EmpProfile";
 
 function AddResourceModal({
   showResourceForm,
   setShowResourceForm,
   viewedEmp,
+  setViewedEmp,
 }) {
   const [color, setColor] = useState("");
   const [activeBtn, setActiveBtn] = useState(false);
@@ -37,24 +38,39 @@ function AddResourceModal({
       des,
       color,
     };
+    if (Object?.keys(viewedEmp)?.length > 0) {
+      console.log("inEdit");
 
-    if (name?.length > 0 && des?.length > 0 && color?.length > 0)
-      activeBtn
-        ? addNewEmployee(utilityData, activeBtn)
-        : addNewEmployee(resourceData, activeBtn);
+      addNewEmployee(resourceData, null, viewedEmp?.id);
+    } else {
+      console.log("in new create mode");
+
+      if (name?.length > 0 && des?.length > 0 && color?.length > 0) {
+        activeBtn
+          ? addNewEmployee(utilityData, activeBtn)
+          : addNewEmployee(resourceData, activeBtn);
+        setShowResourceForm(!showResourceForm);
+      } else {
+        alert("Ensure that all fields are filled out");
+      }
+    }
+  };
+
+  const convertDateFormat = (e) => {
+    return moment.utc(e).format("DD/MM/YY");
   };
 
   useEffect(() => {
-    if (!ourEmpData) return;
-    setColor(ourEmpData?.colour ? ourEmpData?.colour : "");
-    setName(ourEmpData?.firstName ? ourEmpData?.firstName : "");
-    setTitle(ourEmpData?.title ? ourEmpData?.title : "");
-    setNum(ourEmpData?.number ? ourEmpData?.number : "");
-    setStartedDate(ourEmpData?.startedDate ? ourEmpData?.startedDate : "");
-    setAddress(ourEmpData?.address ? ourEmpData?.address : "");
-    setDob(ourEmpData?.dateOfBirth ? ourEmpData?.dateOfBirth : "");
-    setHoliday(ourEmpData?.holiday ? ourEmpData?.holiday : "");
-    setDes(ourEmpData?.description ? ourEmpData?.description : "");
+    if (!viewedEmp) return;
+    setColor(viewedEmp?.colour ? viewedEmp?.colour : "");
+    setName(viewedEmp?.firstName ? viewedEmp?.firstName : "");
+    setTitle(viewedEmp?.title ? viewedEmp?.title : "");
+    setNum(viewedEmp?.number ? viewedEmp?.number : "");
+    setStartedDate(viewedEmp?.startedDate ? viewedEmp?.startedDate : "");
+    setAddress(viewedEmp?.address ? viewedEmp?.address : "");
+    setDob(viewedEmp?.dateOfBirth ? viewedEmp?.dateOfBirth : "");
+    setHoliday(viewedEmp?.holiday ? viewedEmp?.holiday : "");
+    setDes(viewedEmp?.description ? viewedEmp?.description : "");
   }, []);
 
   return (
@@ -68,7 +84,7 @@ function AddResourceModal({
               <input
                 className="colorInp__addResModal"
                 type="color"
-                defaultValue={color}
+                value={color}
                 onChange={(e) => setColor(e.target.value)}
               />
             </div>
@@ -77,6 +93,7 @@ function AddResourceModal({
               onClick={() => {
                 handleSave();
                 setShowResourceForm(!showResourceForm);
+                setViewedEmp({});
               }}
             >
               save
@@ -85,6 +102,7 @@ function AddResourceModal({
               className="closeIconBtn"
               onClick={() => {
                 setShowResourceForm(!showResourceForm);
+                setViewedEmp({});
               }}
             >
               <img src={closeIcon} alt="close icon" />
@@ -200,11 +218,12 @@ function AddResourceModal({
                       <Form.Control
                         className="commonInpStyleNewJob"
                         type="text"
-                        value={startedDate}
-                        onChange={(e) => {
-                          setStartedDate(e.target.value);
-                        }}
+                        defaultValue={startedDate}
                         onFocus={(e) => (e.target.type = "date")}
+                        onChange={(e) => {
+                          let convertedDate = convertDateFormat(e.target.value);
+                          setStartedDate(convertedDate);
+                        }}
                         placeholder="DD/MM/YY"
                       />
                     </Form.Group>
@@ -251,11 +270,12 @@ function AddResourceModal({
                       <Form.Control
                         className="commonInpStyleNewJob"
                         type="text"
-                        value={dob}
-                        onChange={(e) => {
-                          setDob(e.target.value);
-                        }}
+                        defaultValue={dob}
                         onFocus={(e) => (e.target.type = "date")}
+                        onChange={(e) => {
+                          let convertedDate = convertDateFormat(e.target.value);
+                          setDob(convertedDate);
+                        }}
                         placeholder="DD/MM/YY"
                       />
                     </Form.Group>
@@ -313,7 +333,7 @@ function AddResourceModal({
                   className="commonInpStyleNewJob"
                   type="text"
                   as="textarea"
-                  style={{ height: "100px" }}
+                  style={{ height: "135px" }}
                   value={des}
                   onChange={(e) => setDes(e.target.value)}
                   placeholder={"Description"}

@@ -7,7 +7,9 @@ import {
   fetchClients,
   fetchEmployees,
 } from "../controller/Airtable";
+import Loader from "./Loader";
 import CompProfile from "./CompProfile";
+
 const SignIn = ({ setUserDetails, userDetails, allClt }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -19,8 +21,6 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
   const [sprints, setSprints] = useState([]);
   const [empData, setEmpData] = useState([]);
   const navigate = useNavigate();
-  console.log("signinAllclt", allClt);
-  // const userEmail = JSON.parse(localStorage.getItem("userCred"))?.email;
 
   const handleSignIn = (e) => {
     e.preventDefault();
@@ -28,7 +28,6 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
     if (email && pass) {
       cred.forEach((data) => {
         if (data.email === email && data.password === pass) {
-          setSuccess("Valid credentials");
           localStorage.setItem(
             "userCred",
             JSON.stringify({
@@ -42,7 +41,8 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
           setPass("");
           setSuccess("");
           setUserDetails(true);
-          navigate("/");
+          setSuccess("Valid credentials");
+          window.location.reload();
         } else {
           setError("Enter valid credentials");
         }
@@ -79,15 +79,13 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
       // setLoaded(!loaded);
     });
   }, []);
-  console.log(sprints);
 
-  console.log("curruser", currUser);
-
+  console.log("Success =>", success, empData);
   return (
     <div className="my-calendar signIn">
       {Object?.keys(currUser)?.length > 0 ? (
         <>
-          {sprints?.length > 0 && client && (
+          {sprints?.length > 0 && client ? (
             <CompProfile
               sprints={sprints}
               userDetails={userDetails}
@@ -96,10 +94,12 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
               cred={currUser}
               empData={empData}
             />
+          ) : (
+            <Loader />
           )}
         </>
       ) : (
-        <form onSubmit={(e) => handleSignIn(e)}>
+        <form>
           {success?.length > 0 ? (
             <p className="success-message__signIn">{success}</p>
           ) : (
@@ -124,6 +124,7 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
           <button
             type="submit"
             className="button__signIn btn-newClient-header__clientPage"
+            onClick={(e) => handleSignIn(e)}
           >
             Sign in
           </button>

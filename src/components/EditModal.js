@@ -327,8 +327,11 @@ function EditModal({
                 clientId,
                 timeAllocated: parseInt(timeAllocated, 10),
               };
-              if (start && end && jobName && description)
+              if (start && end && jobName && description) {
                 handleEditSprintAndJob(sprintData, jobData);
+              } else {
+                alert("Ensure that all fields are filled out");
+              }
               setStart("");
               setEnd("");
               setJobName("");

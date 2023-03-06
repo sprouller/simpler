@@ -54,7 +54,6 @@ function AddEventModal({
   };
 
   const createJobCode = (_id) => {
-    console.log(sprint, typeof sprint);
     let newFilteredArr = sprint
       ?.filter((allData) => {
         return allData?.job?.client?.id === _id;
@@ -106,6 +105,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="clientInputAdd">
                   <Form.Label>Client</Form.Label>
                   <Form.Select
+                    className="commonInpStyleNewJob"
                     required
                     onChange={(e) => {
                       setClientId(e.target.value);
@@ -129,6 +129,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="subBrandInputAdd">
                   <Form.Label>Sub Brand</Form.Label>
                   <Form.Select
+                    className="commonInpStyleNewJob"
                     value={subBrand}
                     onChange={(e) => {
                       setSubBrands(e.target.value);
@@ -142,20 +143,16 @@ function AddEventModal({
                           if (clientData.id === clientId) {
                             return clientData?.subbrand?.map(
                               (subData, index) => {
-                                return (
+                                return subData?.length > 0 ? (
                                   <option key={index} value={subData}>
                                     {subData}
                                   </option>
+                                ) : (
+                                  ""
                                 );
                               }
                             );
                           }
-                        } else {
-                          return (
-                            <option key={index} value="None">
-                              None
-                            </option>
-                          );
                         }
                       })}
                   </Form.Select>
@@ -167,6 +164,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="startDateInputAdd">
                   <Form.Label>Start Date</Form.Label>
                   <Form.Control
+                    className="commonInpStyleNewJob"
                     type="text"
                     onFocus={(e) => (e.target.type = "date")}
                     onChange={(e) => {
@@ -182,6 +180,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="endDateInputAdd">
                   <Form.Label>End Date</Form.Label>
                   <Form.Control
+                    className="commonInpStyleNewJob"
                     type="text"
                     onChange={(e) => {
                       let newEndDate = getStartDateText(e.target.value);
@@ -199,6 +198,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="jobCodeInputAdd">
                   <Form.Label>Job Code</Form.Label>
                   <Form.Control
+                    className="commonInpStyleNewJob"
                     type="text"
                     value={jobCode}
                     onChange={(e) => setJobCode(e.target.value)}
@@ -210,6 +210,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="jobNameInputAdd">
                   <Form.Label>Job Name</Form.Label>
                   <Form.Control
+                    className="commonInpStyleNewJob"
                     type="text"
                     onChange={(e) => setJobName(e.target.value)}
                     defaultValue={""}
@@ -223,6 +224,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="timeAllocatedInputAdd">
                   <Form.Label> Estimated Time Allocated</Form.Label>
                   <Form.Control
+                    className="commonInpStyleNewJob"
                     type="number"
                     defaultValue={0}
                     onChange={(e) => setTimeAllocated(e.target.value)}
@@ -238,6 +240,7 @@ function AddEventModal({
                 >
                   <Form.Label>Assign to Employee</Form.Label>
                   <Form.Select
+                    className="commonInpStyleNewJob"
                     defaultValue={""}
                     onChange={(e) => {
                       setEmployeeId(e.target.value);
@@ -261,6 +264,7 @@ function AddEventModal({
               <Form.Group className="mb-3" controlId="descriptionInputAdd">
                 <Form.Label>Description</Form.Label>
                 <Form.Control
+                  className="commonInpStyleNewJob"
                   type="text"
                   as="textarea"
                   style={{ height: "100px" }}
@@ -275,6 +279,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="thirdPartyItemInputAdd">
                   <Form.Label>Third Party Item</Form.Label>
                   <Form.Control
+                    className="commonInpStyleNewJob"
                     type="text"
                     onChange={(e) => setThirdPartyItem(e.target.value)}
                     defaultValue={""}
@@ -286,6 +291,7 @@ function AddEventModal({
                 <Form.Group className="mb-3" controlId="thirdPartyCost">
                   <Form.Label>Cost £</Form.Label>
                   <Form.Control
+                    className="commonInpStyleNewJob"
                     type="number"
                     onChange={(e) => setThirdPartyCost(e.target.value)}
                     defaultValue={""}
@@ -303,8 +309,13 @@ function AddEventModal({
             variant="success"
             onClick={() => {
               const sprint = {
-                start: moment(`${start.replace("/", "").trim()}`, "DDMMYY").format("yyyy[-]MM[-]DD"),
-                end: moment(`${end.replace("/", "").trim()}`, "DDMMYY").format("yyyy[-]MM[-]DD"),
+                start: moment(
+                  `${start.replace("/", "").trim()}`,
+                  "DDMMYY"
+                ).format("yyyy[-]MM[-]DD"),
+                end: moment(`${end.replace("/", "").trim()}`, "DDMMYY").format(
+                  "yyyy[-]MM[-]DD"
+                ),
                 employeeId,
               };
               const job = {
@@ -314,9 +325,22 @@ function AddEventModal({
                 jobCode,
                 description,
                 subBrand,
+                thirdPartyItem,
+                thirdPartyCost,
               };
-              if (jobName && jobCode && description && start && end)
+              if (
+                start &&
+                end &&
+                jobName &&
+                jobCode &&
+                employeeId &&
+                clientId &&
+                subBrand
+              ) {
                 handleScheduleJob(job, sprint);
+              } else {
+                alert("Ensure that all fields are filled out");
+              }
               setStart("");
               setEnd("");
               setJobName("");
