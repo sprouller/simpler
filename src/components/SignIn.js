@@ -81,6 +81,7 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
     });
   }, []);
 
+  console.log("Success =>", success, empData);
   return (
     <div className="my-calendar signIn">
       {currUser?.length > 0 ? (
