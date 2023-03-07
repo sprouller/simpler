@@ -3,6 +3,7 @@ import closeIcon from "../images/closeIcon.svg";
 import { Col, Form, Modal, ModalBody, ModalHeader, Row } from "react-bootstrap";
 import moment from "moment";
 import "moment-timezone";
+import "../App.css";
 
 function ScheduleNewJob({
   showScheduleJobModal,
@@ -143,16 +144,29 @@ function ScheduleNewJob({
                   jobCode,
                   description,
                   subBrand,
+                  thirdPartyItem,
+                  thirdPartyCost,
                 };
-                if (start && end && jobName && jobCode && description)
+                if (
+                  start &&
+                  end &&
+                  jobName &&
+                  jobCode &&
+                  employeeId &&
+                  clientId &&
+                  subBrand
+                ) {
                   handleScheduleJob(job, sprint);
+                  setShowScheduleJobModal(!showScheduleJobModal);
+                } else {
+                  alert("Ensure that all fields are filled out");
+                }
                 setStart("");
                 setEnd("");
                 setJobName("");
                 setTimeAllocated(0);
                 setDescription("");
                 setJobCode("");
-                setShowScheduleJobModal(!showScheduleJobModal);
               }}
             >
               save
@@ -213,20 +227,16 @@ function ScheduleNewJob({
                             if (clientData.id === clientId) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {
-                                  return (
+                                  return subData?.length > 0 ? (
                                     <option key={index} value={subData}>
                                       {subData}
                                     </option>
+                                  ) : (
+                                    ""
                                   );
                                 }
                               );
                             }
-                          } else {
-                            return (
-                              <option key={index} value="None">
-                                None
-                              </option>
-                            );
                           }
                         })}
                     </Form.Select>
@@ -510,20 +520,16 @@ function ScheduleNewJob({
                             if (clientData.id === clientId) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {
-                                  return (
+                                  return subData?.length > 0 ? (
                                     <option key={index} value={subData}>
                                       {subData}
                                     </option>
+                                  ) : (
+                                    ""
                                   );
                                 }
                               );
                             }
-                          } else {
-                            return (
-                              <option key={index} value="None">
-                                None
-                              </option>
-                            );
                           }
                         })}
                     </Form.Select>
