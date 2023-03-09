@@ -258,35 +258,8 @@ const BasicCalendar = ({ handleClient }) => {
   const handleEventStyles = (event) => {
     let style;
     if (event?.item?.length > 0) {
-      event?.item === "Holiday"
-        ? (style = {
-            backgroundColor: "#000",
-            borderRadius: "10px",
-            color: "#fff",
-            border: "0px",
-            display: "block",
-            width: "97%",
-            marginLeft: "5px",
-            hover: {
-              visbility: "hidden",
-            },
-          })
-        : (style = {
-            backgroundColor: "#ff5733",
-            borderRadius: "10px",
-            color: "#fff",
-            border: "0px",
-            display: "block",
-            width: "97%",
-            marginLeft: "5px",
-            hover: {
-              visbility: "hidden",
-            },
-          });
-    } else {
-      const bgColor = event?.employee?.colour;
       style = {
-        backgroundColor: event?.employee?.colour,
+        backgroundColor: event?.item === "Holiday" ? "#000" : "#ff5733",
         borderRadius: "10px",
         color: "#fff",
         border: "0px",
@@ -297,6 +270,28 @@ const BasicCalendar = ({ handleClient }) => {
           visbility: "hidden",
         },
       };
+    } else {
+      if (
+        event?.employee?.firstName === undefined ||
+        event?.employee?.firstName?.length === 0
+      ) {
+        style = {
+          display: "none",
+        };
+      } else {
+        style = {
+          backgroundColor: event?.employee?.colour,
+          borderRadius: "10px",
+          color: "#fff",
+          border: "0px",
+          display: "block",
+          width: "97%",
+          marginLeft: "5px",
+          hover: {
+            visbility: "hidden",
+          },
+        };
+      }
     }
     return {
       style: style,

@@ -194,18 +194,21 @@ export async function fetchWorkItemsByJobId(jobId) {
 export async function addNewClient(clientDetails) {
   let { clientType, subClient, description, client, createdAt, compLogo } =
     clientDetails;
-
+  console.log("Airtable", subClient);
   try {
     let returnedNewClient = await base(
       process.env.REACT_APP_CLIENTS_TABLE_ID
-    ).create({
-      name: client,
-      client_since: createdAt,
-      subbrand: subClient,
-      client_type: clientType,
-      description: description,
-      // comp_logo: compLogo,
-    });
+    ).create(
+      {
+        name: client,
+        client_since: createdAt,
+        subbrand: subClient,
+        client_type: clientType,
+        description: description,
+        // comp_logo: compLogo,
+      },
+      { typecast: true }
+    );
     console.log("airTable compLogo", compLogo);
     let clientId = returnedNewClient.getId();
     console.log(`Client ${clientId} added to Airtable`);

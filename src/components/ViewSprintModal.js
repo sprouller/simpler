@@ -56,7 +56,6 @@ function ViewSprintModal({
       </>
     );
   }
-  console.log("All the data are......", sprint);
   const handleAddWorkItem = async (sprintId, date, hours) => {
     console.log("handleAddWorkItem");
     console.log({ sprintId, date, hours });

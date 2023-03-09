@@ -1,4 +1,3 @@
-import React from "react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import calenderSvgGreen from "../images/calender-green.svg";

@@ -137,7 +137,6 @@ function CompProfile({ sprints, clients, cred, empData }) {
                 </div>
                 <div className="d-flex empCont__CompProfile">
                   {jobRelatedToEmp?.map((data) => {
-                    console.log("empData", data);
                     return (
                       <div
                         className="emp-empCont__CompProfile"
