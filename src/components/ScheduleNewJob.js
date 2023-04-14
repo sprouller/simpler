@@ -228,10 +228,12 @@ function ScheduleNewJob({
                             if (clientData?.subbrand?.length > 0) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {
-                                  return (
+                                  return subData?.length > 0 ? (
                                     <option key={index} value={subData}>
                                       {subData}
                                     </option>
+                                  ) : (
+                                    ""
                                   );
                                 }
                               );
@@ -526,10 +528,12 @@ function ScheduleNewJob({
                             if (clientData?.subbrand?.length > 0) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {
-                                  return (
+                                  return subData?.length > 0 ? (
                                     <option key={index} value={subData}>
                                       {subData}
                                     </option>
+                                  ) : (
+                                    ""
                                   );
                                 }
                               );

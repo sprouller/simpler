@@ -114,6 +114,7 @@ export default function LeftCalendarSec({
                 onClick={() => {
                   handleUtilData(utility);
                   setClickedUtil(utility.name);
+                  setIsEventFltClicked(true);
                   // handleUtilBg();
                 }}
               >
