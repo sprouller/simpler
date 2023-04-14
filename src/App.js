@@ -9,8 +9,8 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import ClientPage from "./components/ClientPage";
 import SpecificClient from "./components/SpecificClient";
 //import SignIn from "./components/SignIn";
-import { useEffect } from "react";
-import { fetchJobs, fetchSprints } from "./controller/Airtable";
+//import { useEffect } from "react";
+//import { fetchJobs, fetchSprints } from "./controller/Airtable";
 import { createHashHistory } from "history";
 
 function App() {
