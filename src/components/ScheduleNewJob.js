@@ -3,6 +3,7 @@ import closeIcon from "../images/closeIcon.svg";
 import { Col, Form, Modal, ModalBody, ModalHeader, Row } from "react-bootstrap";
 import moment from "moment";
 import "moment-timezone";
+import "../App.css";
 
 function ScheduleNewJob({
   showScheduleJobModal,
@@ -143,16 +144,29 @@ function ScheduleNewJob({
                   jobCode,
                   description,
                   subBrand,
+                  thirdPartyItem,
+                  thirdPartyCost,
                 };
-                if (start && end && jobName && jobCode && description)
+                if (
+                  start &&
+                  end &&
+                  jobName &&
+                  jobCode &&
+                  employeeId &&
+                  clientId &&
+                  subBrand
+                ) {
                   handleScheduleJob(job, sprint);
+                  setShowScheduleJobModal(!showScheduleJobModal);
+                } else {
+                  alert("Ensure that all fields are filled out");
+                }
                 setStart("");
                 setEnd("");
                 setJobName("");
                 setTimeAllocated(0);
                 setDescription("");
                 setJobCode("");
-                setShowScheduleJobModal(!showScheduleJobModal);
               }}
             >
               save
@@ -209,8 +223,9 @@ function ScheduleNewJob({
                       <option>Assign to Sub Brand</option>;
                       {clientId &&
                         clients?.map((clientData, index) => {
-                          if (clientData?.subbrand?.length > 0) {
-                            if (clientData.id === clientId) {
+                          if (clientData.id === clientId) {
+                            console.log("cltData", clientData);
+                            if (clientData?.subbrand?.length > 0) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {
                                   return (
@@ -220,13 +235,13 @@ function ScheduleNewJob({
                                   );
                                 }
                               );
+                            } else {
+                              return (
+                                <option key={index} value="No subbrand">
+                                  No subbrand
+                                </option>
+                              );
                             }
-                          } else {
-                            return (
-                              <option key={index} value="None">
-                                None
-                              </option>
-                            );
                           }
                         })}
                     </Form.Select>
@@ -506,8 +521,9 @@ function ScheduleNewJob({
                       <option>Assign to Sub Brand</option>;
                       {clientId &&
                         clients?.map((clientData, index) => {
-                          if (clientData?.subbrand?.length > 0) {
-                            if (clientData.id === clientId) {
+                          if (clientData.id === clientId) {
+                            console.log("cltData", clientData);
+                            if (clientData?.subbrand?.length > 0) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {
                                   return (
@@ -517,13 +533,13 @@ function ScheduleNewJob({
                                   );
                                 }
                               );
+                            } else {
+                              return (
+                                <option key={index} value="No subbrand">
+                                  No subbrand
+                                </option>
+                              );
                             }
-                          } else {
-                            return (
-                              <option key={index} value="None">
-                                None
-                              </option>
-                            );
                           }
                         })}
                     </Form.Select>

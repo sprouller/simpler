@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Form, Link } from "react-router-dom";
-import { fetchClients } from "../controller/Airtable";
+import { Link, useNavigate } from "react-router-dom";
 import refreshIcon from "../images/refreshIcon.svg";
+import empSvg from "../images/employeeSvg.svg";
 import plusIconWhite from "../images/plusIconWhite.svg";
-import { Col, Modal, ModalBody, ModalHeader, Row } from "react-bootstrap";
 import AddResourceModal from "./AddResourceModal";
 import EmpProfile from "./EmpProfile";
 
-function CompProfile({ handleLogOut, sprints, clients, cred, empData }) {
+function CompProfile({ sprints, clients, cred, empData }) {
   const [parseCred, setParseCred] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSpecificClt, setIsSpecificCltSet] = useState(false);
@@ -17,7 +16,8 @@ function CompProfile({ handleLogOut, sprints, clients, cred, empData }) {
   const [showEmpProfile, setShowEmpProfile] = useState(false);
   const [empId, setEmpId] = useState("");
   const [viewedEmp, setViewedEmp] = useState({});
-  console.log(sprints);
+  const navigate = useNavigate();
+
   const getSpecificClt = () => {
     // setIsLoaded(!isLoaded);
     isLoaded === true &&
@@ -36,7 +36,6 @@ function CompProfile({ handleLogOut, sprints, clients, cred, empData }) {
           return { jobData: data?.job?.id, empData: data?.employee };
         }
       });
-      console.log("filtered", filteredData, sprints);
       setJobRelatedToEmp(filteredData);
     }
   };
@@ -59,15 +58,12 @@ function CompProfile({ handleLogOut, sprints, clients, cred, empData }) {
     setShowEmpProfile(!showEmpProfile);
   };
 
-  console.log(empId);
+  const handleSelectedEmp = (data) => {
+    setViewedEmp(data);
+  };
+
   return (
     <>
-      {/*
-      // logoutBtn
-      <button
-        // className="button__signIn btn-newClient-header__clientPage"
-        onClick={handleLogOut}
-      ></button> */}
       <div className="clientPage compProfile">
         <div className="header__clientPage header__compProfile">
           <div className="d-flex" style={{ alignItems: "center" }}>
@@ -80,12 +76,24 @@ function CompProfile({ handleLogOut, sprints, clients, cred, empData }) {
             </Link>
             <p className="header__clientPageTitle">{specificClt?.name}</p>
           </div>
-          <div className="refreshIcon-header__clientPage">
-            <img
-              src={refreshIcon}
-              alt="refresh icon"
-              onClick={() => getSpecificClt()}
-            />
+          <div className="d-flex">
+            <button
+              className="button__signIn btn-newClient-header__clientPage signOutBtn__compProfile"
+              onClick={() => {
+                localStorage.setItem("userCred", "");
+                // window.location.reload();
+                navigate(0);
+              }}
+            >
+              Sign out
+            </button>
+            <div className="refreshIcon-header__clientPage">
+              <img
+                src={refreshIcon}
+                alt="refresh icon"
+                onClick={() => getSpecificClt()}
+              />
+            </div>
           </div>
         </div>
         <div
@@ -136,14 +144,23 @@ function CompProfile({ handleLogOut, sprints, clients, cred, empData }) {
                         key={data?.id}
                       >
                         <img
-                          src="https://image.cnbcfm.com/api/v1/image/106930629-1629399630371-gettyimages-494691340-87856868.jpeg?v=1629399760&w=740&h=416&ffmt=webp&vtcrop=y"
+                          src={empSvg}
                           alt="empImage"
+                          style={{
+                            backgroundColor: `${data?.employee?.colour}80`,
+                          }}
                         />
                         <div className="details-emp-empCont__CompProfile">
                           <p style={{ fontWeight: "600" }}>
-                            {data?.employee?.firstName}
+                            {data?.employee?.firstName?.length > 0
+                              ? data?.employee?.firstName
+                              : "- - -"}
                           </p>
-                          <p>{data?.job?.name}</p>
+                          <p>
+                            {data?.job?.name?.length
+                              ? data?.job?.name
+                              : "Job name"}
+                          </p>
                         </div>
                       </div>
                     );
@@ -220,6 +237,7 @@ function CompProfile({ handleLogOut, sprints, clients, cred, empData }) {
             setShowResourceForm={setShowResourceForm}
             showResourceForm={showResourceForm}
             viewedEmp={viewedEmp}
+            setViewedEmp={setViewedEmp}
           />
         )}
         {showEmpProfile && (
@@ -231,6 +249,7 @@ function CompProfile({ handleLogOut, sprints, clients, cred, empData }) {
             setShowResourceForm={setShowResourceForm}
             showResourceForm={showResourceForm}
             setViewedEmp={setViewedEmp}
+            handleSelectedEmp={handleSelectedEmp}
           />
         )}
       </>

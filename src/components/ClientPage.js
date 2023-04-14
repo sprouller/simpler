@@ -4,7 +4,7 @@ import refreshIcon from "../images/refreshIcon.svg";
 import searchIcon from "../images/searchIcon.svg";
 import defaultImage from "../images/flower-green.svg";
 import { useNavigate } from "react-router-dom";
-import { fetchClients } from "../controller/Airtable";
+import { fetchClients, fetchJobs } from "../controller/Airtable";
 import "../App.css";
 import CreateNewClient from "./CreateNewClient";
 
@@ -99,45 +99,88 @@ function ClientPage() {
         </div>
       </div>
 
-      <div className="detailsContainer__clientPage">
-        <div className="projectBased-detailsContainer__clientPage commonContainer-detailsContainer__clientPage">
-          <p>Project based clients</p>
-          <div className="searchContainer-detailsContainer__clientPage">
-            <img src={searchIcon} alt="search icon" />
-            <input
-              type="text"
-              value={PBSearch}
-              onChange={(e) => {
-                setPBSearch(e.target.value);
-                e.target.value.length > 0
-                  ? handleProjectSearch(e)
-                  : getClientsDetails();
-              }}
-              placeholder="Search"
-            />
+      {activeBtn === false && (
+        <div className="detailsContainer__clientPage">
+          <div className="projectBased-detailsContainer__clientPage commonContainer-detailsContainer__clientPage">
+            <p>Project based clients</p>
+            <div className="searchContainer-detailsContainer__clientPage">
+              <img src={searchIcon} alt="search icon" />
+              <input
+                type="text"
+                value={PBSearch}
+                onChange={(e) => {
+                  setPBSearch(e.target.value);
+                  e.target.value.length > 0
+                    ? handleProjectSearch(e)
+                    : getClientsDetails();
+                }}
+                placeholder="Search"
+              />
+            </div>
+            <div className="dataContainer-detailsContainer__clientPage">
+              {projectBasedClt.map((data) => {
+                return (
+                  <div
+                    className="data-detailsContainer__clientPage"
+                    key={data?.id}
+                    onClick={() => {
+                      location(`/client/${data?.id}`);
+                    }}
+                  >
+                    <img
+                      src={
+                        data.comp_logo ? data.comp_logo[0].url : defaultImage
+                      }
+                      alt={data?.name}
+                    />
+                    <p>{data?.name}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="dataContainer-detailsContainer__clientPage">
-            {projectBasedClt.map((data) => {
-              return (
-                <div
-                  className="data-detailsContainer__clientPage"
-                  key={data?.id}
-                  onClick={() => {
-                    location(`/client/${data?.id}`);
-                  }}
-                >
-                  <img
-                    src={data.comp_logo ? data.comp_logo[0].url : defaultImage}
-                    alt={data?.name}
-                  />
-                  <p>{data?.name}</p>
-                </div>
-              );
-            })}
+          <div className="retainerBased-detailsContainer__clientPage commonContainer-detailsContainer__clientPage">
+            <p>Retainer based clients</p>
+            <div className="searchContainer-detailsContainer__clientPage">
+              <img src={searchIcon} alt="search icon" />
+              <input
+                type="text"
+                value={RBSearch}
+                onChange={(e) => {
+                  setRBSearch(e.target.value);
+                  e.target.value.length > 0
+                    ? handleRetainSearch(e)
+                    : getClientsDetails();
+                }}
+                placeholder="Search"
+              />
+            </div>
+            <div className="dataContainer-detailsContainer__clientPage">
+              {retainerClt.map((data) => {
+                return (
+                  <div
+                    className="data-detailsContainer__clientPage"
+                    key={data.id}
+                    onClick={() => location(`/client/${data?.id}`)}
+                  >
+                    <img
+                      src={
+                        data.comp_logo ? data.comp_logo[0].url : defaultImage
+                      }
+                      alt={data.name}
+                    />
+                    <p>{data.name}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-        <div className="retainerBased-detailsContainer__clientPage commonContainer-detailsContainer__clientPage">
-          <p>Retainer based clients</p>
+      )}
+
+      {/* {activeBtn === true && ( */}
+      {/* <div className="archivedClient__clientPage">
+          <p>Archived clients</p>
           <div className="searchContainer-detailsContainer__clientPage">
             <img src={searchIcon} alt="search icon" />
             <input
@@ -153,24 +196,13 @@ function ClientPage() {
             />
           </div>
           <div className="dataContainer-detailsContainer__clientPage">
-            {retainerClt.map((data) => {
-              return (
-                <div
-                  className="data-detailsContainer__clientPage"
-                  key={data.id}
-                  onClick={() => location(`/client/${data?.id}`)}
-                >
-                  <img
-                    src={data.comp_logo ? data.comp_logo[0].url : defaultImage}
-                    alt={data.name}
-                  />
-                  <p>{data.name}</p>
-                </div>
-              );
-            })}
+            <div className="data-detailsContainer__clientPage">
+              <img src={defaultImage} alt={"test clt"} />
+              <p>{"Test client"}</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </div> */}
+      {/* )} */}
 
       {showClientModal && (
         <CreateNewClient show={showClientModal} setShow={setShowClientModal} />

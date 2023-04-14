@@ -94,8 +94,10 @@ body {
 
 .logo-with-hover {
   max-width: 200px;
+  max-height: 50px;
 }
 .logo-without-hover {
+  max-height: 50px;
   max-width: 35px;
 }
 
@@ -137,11 +139,32 @@ body {
 }
 
 .showArrow::after {
-  content: ">";
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: transparent;
+  border-top: 2px solid #858685;
+  border-right: 2px solid #858685;
   position: absolute;
   right: 15px;
   font-size: 25px;
   color: inherit;
+  font-family: "Roboto", sans-serif;
+  transform: rotate(45deg);
+}
+.showArrowGreen::after {
+  border-top: 2px solid #20e29f;
+  border-right: 2px solid #20e29f;
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: transparent;
+  position: absolute;
+  right: 15px;
+  font-size: 25px;
+  color: inherit;
+  font-family: "Roboto", sans-serif;
+  transform: rotate(45deg);
 }
 
 .active-link {
@@ -162,32 +185,11 @@ body {
 /* mycalendar */
 .my-calendar {
   width: 100%;
-  height: "90vh";
-  overflow-y: "auto";
+  /* height: "90vh";
+  overflow-y: "auto"; */
+  overflow: hidden;
   padding: 30px;
   background-color: var(--my-calendar-bg-color);
-}
-
-/* event color */
-.rbc-event {
-  background-color: var(--event-bg-color);
-  box-shadow: none !important;
-  font-weight: 300 !important;
-  outline: none !important;
-}
-
-.rbc-event.rbc-selected,
-.rbc-day-slot .rbc-selected.rbc-background-event {
-  background-color: var(--theme-color);
-}
-.rbc-show-more {
-  color: var(--theme-color);
-}
-
-/* today color  */
- .rbc-day-bg.rbc-today {
-  transition: background-color 0.5s;
-  background-color: var(--today-bg-color);
 }
 
 /* header style  */
@@ -205,6 +207,12 @@ body {
 }
 .rbc-toolbar {
   display: none;
+}
+.rbc-event:focus,
+.rbc-event:focus-within {
+  border: none;
+  outline: none;
+  background-color: none;
 }
 
 .calenderTopBar {
@@ -294,6 +302,7 @@ body {
 
 .rbc-addons-dnd {
   width: 100%;
+  overflow-x: scroll;
 }
 .rbc-row {
   padding-right: 5px;
@@ -312,7 +321,11 @@ body {
 .rbc-month-row {
   height: fit-content;
   padding: 10px 0;
-  min-height: 100px;
+  /* min-height: 100px; */
+  min-height: 20%;
+}
+.rbc-month-row:last-child {
+  padding-bottom: 0;
 }
 
 .rbc-month-header {
@@ -350,7 +363,7 @@ body {
 }
 
 .rbc-event-content {
-  font-size: 14px;
+  font-size: 10px;
 }
 
 .rbc-date-cell {
@@ -360,14 +373,14 @@ body {
   margin: 1px 0;
 }
 .cellOptions__myCalendar {
-  width: 91%;
+  width: 89%;
   margin-left: 5px;
   position: relative;
   display: flex;
   justify-content: space-between;
   height: 100%;
   flex-direction: column;
-  min-height: 80px;
+  min-height: 13.7vh;
 }
 .day-cellOptions__myCalendar,
 .date-cellOptions__myCalendar {
@@ -382,7 +395,7 @@ body {
 
 .mainCalenderContainer {
   display: flex;
-  height: 80vh;
+  height: 85vh;
 }
 .left_mainCalenderContainer {
   width: 242px;
@@ -390,6 +403,7 @@ body {
   box-shadow: 0px 0px 3px 1px #e7e7e7;
   margin-right: 5px;
   border-radius: 20px;
+  height: 97%;
 }
 
 .firstChild_leftMenu,
@@ -404,7 +418,7 @@ body {
 
 .allClient-firstChild_leftMenu {
   overflow-y: scroll;
-  height: 50%;
+  height: 60%;
   padding: 5px 0px;
 }
 
@@ -693,11 +707,18 @@ body {
   margin-right: 10px;
 }
 .data-detailsContainer__clientPage::after {
-  content: ">";
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: transparent;
+  border-top: 2px solid #000;
+  border-right: 2px solid #000;
   position: absolute;
-  font-size: 18px;
-  right: 0px;
-  top: 9px;
+  right: 15px;
+  font-size: 25px;
+  color: inherit;
+  font-family: "Roboto", sans-serif;
+  transform: rotate(45deg);
 }
 .data-detailsContainer__clientPage img {
   max-width: 30px;
@@ -762,7 +783,7 @@ th {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 50px;
+  padding-top: 30px;
 }
 .signIn form {
   width: 80%;
@@ -826,10 +847,11 @@ th {
   color: #fff;
   background: #000;
   border-radius: 50%;
-  padding: 2px 10px 1px 10px;
+  padding: 2px 11px 1px 11px;
 }
 .userDetails__sideBar {
   width: fit-content;
+  cursor: pointer;
 }
 
 .compProfile {
@@ -864,13 +886,18 @@ th {
   max-width: 255px;
 }
 .emp-empCont__CompProfile::after {
-  content: ">";
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: transparent;
+  border-top: 2px solid #000;
+  border-right: 2px solid #000;
   position: absolute;
-  right: 4px;
-  font-size: 20px;
+  right: 5px;
+  font-size: 25px;
   color: inherit;
-  top: 10px;
-  font-weight: 100;
+  font-family: "Roboto", sans-serif;
+  transform: rotate(45deg);
 }
 
 .emp-empCont__CompProfile img {
@@ -968,4 +995,170 @@ th {
 .disCont-personCont__empProfile p {
   font-size: 12px;
   color: var(--normal-nav-text-color);
+}
+.signOutBtn__compProfile {
+  padding: 0px 14px;
+  width: fit-content;
+  font-size: 12px;
+}
+.radio__outOfOffice > .form-check {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  padding: 0;
+  margin: 0;
+}
+.radio__outOfOffice > .form-check > input {
+  margin-left: 8px;
+  margin-right: 20px;
+}
+
+.form-check-input {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  margin-top: 0;
+}
+.form-check-input:checked,
+.form-check-input:active,
+.form-check-input:focus {
+  background-color: var(--active-nav-text-color);
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+.form-check-input:checked[type="radio"] {
+  background-image: none;
+}
+.loader {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--grey-border);
+}
+
+.edit-client__clientPage {
+  background: none;
+  text-decoration: underline;
+  font-size: 15px;
+  padding: 0;
+  border: none;
+  margin-right: 20px;
+  font-family: "sofia-pro", sans-serif;
+}
+
+.cellEvent__myCalendar span {
+  font-size: 10px;
+}
+
+.archivedClient__clientPage {
+  background-color: #fff;
+  box-shadow: 6px 0px 12px #e7e7e7;
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin-right: 30px;
+  height: 80vh;
+}
+.archivedClient__clientPage p {
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 0;
+  font-family: "sofia-pro", sans-serif;
+  margin-bottom: 5px;
+}
+.viewSprint-inner-modal {
+  margin: 10px 0px;
+  background-color: #ededed;
+  border-radius: 18px;
+  padding: 20px 15px;
+}
+.viewSprint-inner-modal strong,
+.viewSprint-inner-modal label {
+  font-size: 15px;
+  line-height: 15px;
+}
+.viewSprint-inner-modal input,
+.viewSprint-inner-modal input:focus,
+.viewSprint-inner-modal select:disabled {
+  background-color: #fff;
+  max-height: 30px;
+  margin: 0 0 0 5px;
+}
+.viewSprint-inner-modal p {
+  font-size: 12px;
+  margin: 0;
+}
+.inputContainer {
+  display: flex;
+  align-items: center;
+}
+.addHours {
+  background: var(--active-nav-text-color);
+  border-radius: 50%;
+  padding: 0;
+  border: none;
+  outline: none;
+  margin-left: 5px;
+}
+.addHours > img {
+  padding: 5px;
+}
+.detailsForm-viewSprint {
+  height: 100%;
+}
+.detailsForm-viewSprint,
+.progressCont {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.progressCont {
+  position: relative;
+  padding: 10px;
+}
+
+.progressCont,
+.progressBar {
+  align-items: center;
+  width: 170px;
+  height: 170px;
+  border: 30px solid #fff;
+  border-radius: 50%;
+  margin: 5px auto;
+}
+.progressBar {
+}
+.progressBar circle {
+  width: 100%;
+  height: 100%;
+  fill: transparent;
+  stroke-width: 30px;
+  stroke-dasharray: 440;
+}
+.CircularProgressbar {
+  position: absolute;
+  border: none;
+  top: -30px;
+  left: -30px;
+  width: inherit !important;
+}
+.CircularProgressbar .CircularProgressbar-path {
+  stroke: #20e29f !important;
+}
+.CircularProgressbar .CircularProgressbar-trail {
+  stroke: #fff !important;
+}
+.jobList-singleRow {
+  cursor: pointer;
+}
+/* media query  */
+
+@media only screen and (max-width: 1105px) {
+  .mainCalenderContainer {
+    height: 80vh;
+  }
 }

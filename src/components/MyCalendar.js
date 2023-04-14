@@ -1,5 +1,5 @@
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import { useState } from "react";
+import { createContext, useState } from "react";
 import moment from "moment";
 import AddEventModal from "./AddEventModal";
 import ViewSprintModal from "./ViewSprintModal";
@@ -19,11 +19,13 @@ import {
   editSprintInTable,
   fetchClients,
   fetchEmployees,
+  fetchOutOfOffice,
   fetchSprints,
 } from "../controller/Airtable";
 import LeftCalendarSec from "./LeftCalendarSec";
 import ScheduleNewJob from "./ScheduleNewJob";
 import { useCallback } from "react";
+import OutOfOfficeModal from "./OutOfOfficeModal";
 
 moment.tz.setDefault("Etc/GMT");
 const localizer = momentLocalizer(moment);
@@ -45,7 +47,6 @@ const monthsArr = [
   "November",
   "December",
 ];
-
 moment.locale("ko", {
   week: {
     dow: 1,
@@ -73,8 +74,11 @@ const BasicCalendar = ({ handleClient }) => {
   const [showScheduleJobModal, setShowScheduleJobModal] = useState(false);
   const [logedUser, setLoggedUser] = useState({});
   const [selectedMonth, setSelectedMonth] = useState(moment().format("MMMM"));
-  console.log("date.....", startDate, endDate);
-
+  //outofoffice
+  const [outOfficeModal, showOutOfficeModal] = useState(false);
+  const [outOfOfficeData, setOutOfOfficeData] = useState([]);
+  const [filteredOutOfOfficeData, setFilteredOutOfOfficeData] = useState([]);
+  const [eventFltClicked, setIsEventFltClicked] = useState(false);
   useEffect(() => {
     fetchSprints().then((sprintsFromAirtable) => {
       setSprints(sprintsFromAirtable);
@@ -85,7 +89,9 @@ const BasicCalendar = ({ handleClient }) => {
     fetchEmployees().then((employeesFromAirtable) => {
       setEmployees(employeesFromAirtable);
     });
-
+    fetchOutOfOffice()
+      .then((outData) => setOutOfOfficeData(outData))
+      .catch((e) => console.log(e));
     // localStorage.getItem()
     // setLoggedUser(JSON.parse(localStorage?.getItem("userCred")));
     currentMonthsDates();
@@ -96,7 +102,7 @@ const BasicCalendar = ({ handleClient }) => {
 
   // }, [startDate, endDate]);
 
-  console.log({ sprints });
+  console.log({ Sprint: sprints });
   console.log({ employees });
   console.log({ clients });
 
@@ -136,6 +142,7 @@ const BasicCalendar = ({ handleClient }) => {
   };
 
   const handleEditSprintAndJob = async (sprintData, jobData) => {
+    console.log("EditJobData", sprintData, jobData);
     await editSprintInTable(sprintData);
     await editJobInTable(jobData);
     fetchSprints().then((sprintsFromAirtable) => {
@@ -177,6 +184,7 @@ const BasicCalendar = ({ handleClient }) => {
     let dragEndDate = new Date(microSecondDate);
     setStartDate(dragStartDate);
     setEndDate(dragEndDate);
+    // setShowScheduleJobModal(!showScheduleJobModal);
     setModalState("add-modal");
   };
 
@@ -248,20 +256,54 @@ const BasicCalendar = ({ handleClient }) => {
 
   console.log({ selectedSprint });
 
+  const eventBg = (event) => {
+    if (event?.item === "Holiday") {
+      return "#ff5733";
+    } else if (event?.item === "work from home") {
+      return "#097969";
+    } else {
+      return event?.employee?.colour;
+    }
+  };
+
   const handleEventStyles = (event) => {
-    const bgColor = event?.employee?.colour;
-    const style = {
-      backgroundColor: event?.employee?.colour,
-      borderRadius: "10px",
-      color: bgColor.slice(0, 6) === ("#FFFFF" || "#fffff") ? "#000" : "#fff",
-      border: "0px",
-      display: "block",
-      width: "97%",
-      marginLeft: "5px",
-      hover: {
-        visbility: "hidden",
-      },
-    };
+    let style;
+    if (event?.item?.length > 0) {
+      style = {
+        backgroundColor: eventBg(event),
+        borderRadius: "10px",
+        color: "#fff",
+        border: "0px",
+        display: "block",
+        width: "96.6%",
+        marginLeft: "5px",
+        hover: {
+          visbility: "hidden",
+        },
+      };
+    } else {
+      if (
+        event?.employee?.firstName === undefined ||
+        event?.employee?.firstName?.length === 0
+      ) {
+        style = {
+          display: "none",
+        };
+      } else {
+        style = {
+          backgroundColor: event?.employee?.colour,
+          borderRadius: "10px",
+          color: "#fff",
+          border: "0px",
+          display: "block",
+          width: "96.6%",
+          marginLeft: "5px",
+          hover: {
+            visbility: "hidden",
+          },
+        };
+      }
+    }
     return {
       style: style,
     };
@@ -292,6 +334,10 @@ const BasicCalendar = ({ handleClient }) => {
     setShowScheduleJobModal(!showScheduleJobModal);
   };
 
+  const handleOutOfOffice = () => {
+    showOutOfficeModal(!outOfficeModal);
+  };
+
   function getMonthStartAndEndDates(monthName, year) {
     const date = moment(`${monthName} ${year}`, "MMMM YYYY");
     let newStrDate = date.startOf("month").toDate();
@@ -314,6 +360,35 @@ const BasicCalendar = ({ handleClient }) => {
   const handleRangeChange = ({ start, end }) => {
     return { start, end };
   };
+  const handleUtilData = (typeOfUtil) => {
+    console.log("type", typeOfUtil);
+    if (typeOfUtil) {
+      let filteredData = outOfOfficeData?.filter((outData) => {
+        return typeOfUtil?.name === outData?.item;
+      });
+
+      filteredData?.forEach((fltData) => {
+        const isInclude = fltData?.start?.includes("GMT");
+        if (isInclude === false) {
+          const startDate = moment(fltData?.start, "DD/MM/YY").toDate();
+          const fullStartDate = moment(startDate).format(
+            "ddd, Do MMM YYYY h:mm:ss"
+          );
+          const endDate = moment(fltData?.end, "DD/MM/YY").toDate();
+          const fullEndDate = moment(endDate).format(
+            "ddd, Do MMM YYYY h:mm:ss"
+          );
+          console.log("form", isInclude, fullStartDate, fullEndDate);
+          fltData.start = `${fullStartDate} GMT`;
+          fltData.end = `${fullEndDate} GMT`;
+        }
+      });
+
+      setFilteredOutOfOfficeData(filteredData);
+    }
+  };
+
+  console.log("filter", filteredOutOfOfficeData, eventFltClicked);
 
   return (
     <div className="my-calendar">
@@ -328,18 +403,12 @@ const BasicCalendar = ({ handleClient }) => {
               <p className="header__clientPageTitle">Scheduling</p>
             </div>
             <div>
-              {/* <button
-                className="btnScheduler-calenderTopBar"
-                onClick={() => setCurrentView("year")}
-              >
-                {moment().format("MMMM")}
-              </button> */}
-
               <select
                 className="monthSelect-calenderTopBar"
                 onChange={(e) => {
                   currentMonthsDates(e.target.value);
                   setSelectedMonth(e.target.value);
+                  setFilteredOutOfOfficeData([]);
                 }}
                 // defaultValue={}
                 value={selectedMonth}
@@ -353,8 +422,7 @@ const BasicCalendar = ({ handleClient }) => {
               <button
                 className="btnScheduler-calenderTopBar"
                 onClick={() => {
-                  // setCurrentView("year");
-                  // setCurrentView("month");
+                  setFilteredOutOfOfficeData([]);
                 }}
               >
                 {moment().format("YYYY")}
@@ -365,6 +433,7 @@ const BasicCalendar = ({ handleClient }) => {
                   setCurrentView("month");
                   setSelectedMonth(moment().format("MMMM"));
                   currentMonthsDates(moment().format("MMMM"));
+                  setFilteredOutOfOfficeData([]);
                 }}
               >
                 Month
@@ -378,10 +447,7 @@ const BasicCalendar = ({ handleClient }) => {
                   const fourWeeksLater = moment(today).add(4, "weeks").toDate();
                   setCurrentView("month");
                   handleRangeChange(today, fourWeeksLater);
-                  // setDates({
-                  //   firstDay: today,
-                  //   lastDay: fourWeeksLater,
-                  // });
+                  setFilteredOutOfOfficeData([]);
                 }}
               >
                 4 Weeks
@@ -390,6 +456,7 @@ const BasicCalendar = ({ handleClient }) => {
                 className="btnScheduler-calenderTopBar"
                 onClick={() => {
                   setCurrentView("week");
+                  setFilteredOutOfOfficeData([]);
                 }}
               >
                 Week
@@ -398,6 +465,7 @@ const BasicCalendar = ({ handleClient }) => {
                 className="btnScheduler-calenderTopBar"
                 onClick={() => {
                   setCurrentView("day");
+                  setFilteredOutOfOfficeData([]);
                 }}
               >
                 Day
@@ -408,6 +476,8 @@ const BasicCalendar = ({ handleClient }) => {
             <button
               className="btn-newClient-header__clientPage"
               style={{ marginLeft: "0px" }}
+              // onClick={() => showOutOfficeModal(!outOfficeModal)}
+              onClick={handleOutOfOffice}
             >
               <img src={plusIconWhite} alt="plus icon white" />
               Out of office
@@ -433,27 +503,73 @@ const BasicCalendar = ({ handleClient }) => {
           employees={[...employees]}
           currSprint={sprints}
           setFilteredSprint={setFilteredSprint}
+          handleUtilData={handleUtilData}
+          setIsEventFltClicked={setIsEventFltClicked}
+          setFilteredOutOfOfficeData={setFilteredOutOfOfficeData}
         />
 
         <DnDCalendar
           localizer={localizer}
-          events={filteredSprint?.length > 0 ? filteredSprint : sprints}
+          events={
+            eventFltClicked === false
+              ? sprints
+              : filteredOutOfOfficeData?.length > 0
+              ? filteredOutOfOfficeData
+              : filteredSprint
+          }
           showAllEvents={true}
           components={{
             month: {
               event: (props) => {
                 return (
-                  <div className="cellEvent__myCalendar">
-                    <span>clients : {props?.event?.job?.client?.name}</span> |
-                    <span>
-                      {" "}
-                      Job code :
-                      {props?.event?.job?.job_code?.length > 0
-                        ? ` ${props?.event?.job?.job_code}`
-                        : " none"}{" "}
-                    </span>
-                    | <span> {props?.event?.employee?.firstName}</span>
-                  </div>
+                  <>
+                    {typeof props?.event?.employee === "object" ? (
+                      <div className="cellEvent__myCalendar">
+                        <span>
+                          {props?.event?.job?.client?.name?.length
+                            ? props?.event?.job?.client?.name
+                            : "XXXX"}
+                        </span>{" "}
+                        |
+                        <span>
+                          {props?.event?.job?.job_code?.length > 0
+                            ? ` ${props?.event?.job?.job_code}`
+                            : " none"}{" "}
+                        </span>
+                        |{" "}
+                        <span>
+                          {" "}
+                          {props?.event?.employee?.firstName?.length > 0
+                            ? props?.event?.employee?.firstName
+                            : "XXXX"}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="cellEvent__myCalendar">
+                        <span>
+                          Employee :{" "}
+                          {props?.event?.employee?.length
+                            ? props?.event?.employee
+                            : "XXXX"}
+                        </span>{" "}
+                        |
+                        <span>
+                          {" "}
+                          {props?.event?.item?.length > 0
+                            ? `${props?.event?.item}`
+                            : " none"}{" "}
+                        </span>
+                        |{" "}
+                        <span>
+                          {" "}
+                          description :{" "}
+                          {props?.event?.description?.length
+                            ? props?.event?.description
+                            : "XXXX"}
+                        </span>
+                      </div>
+                    )}
+                  </>
                 );
               },
               dateHeader: (props) => {
@@ -531,6 +647,7 @@ const BasicCalendar = ({ handleClient }) => {
         handleDeleteSprint={handleDeleteSprint}
         logedUser={logedUser}
       />
+
       <EditModal
         modalState={modalState}
         sprint={selectedSprint}
@@ -542,6 +659,7 @@ const BasicCalendar = ({ handleClient }) => {
         setModalState={setModalState}
         handleClose={handleClose}
         handleEditSprintAndJob={handleEditSprintAndJob}
+        handleDeleteSprint={handleDeleteSprint}
       />
       <ScheduleNewJob
         showScheduleJobModal={showScheduleJobModal}
@@ -552,6 +670,12 @@ const BasicCalendar = ({ handleClient }) => {
         endDate={endDate}
         employees={employees}
         handleScheduleJob={handleScheduleJob}
+      />
+      <OutOfOfficeModal
+        showOutOfficeModal={showOutOfficeModal}
+        outOfOfficeModal={outOfficeModal}
+        employees={employees}
+        setSh
       />
     </div>
   );

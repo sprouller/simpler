@@ -7,7 +7,9 @@ import {
   fetchClients,
   fetchEmployees,
 } from "../controller/Airtable";
+import Loader from "./Loader";
 import CompProfile from "./CompProfile";
+
 const SignIn = ({ setUserDetails, userDetails, allClt }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -15,20 +17,16 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
   const [pass, setPass] = useState("");
   const [cred, setCred] = useState([]);
   const [client, setAllClt] = useState(null);
-  const [currUser, setCurrUser] = useState({});
+  const [currUser, setCurrUser] = useState("");
   const [sprints, setSprints] = useState([]);
   const [empData, setEmpData] = useState([]);
   const navigate = useNavigate();
-  console.log("signinAllclt", allClt);
-  // const userEmail = JSON.parse(localStorage.getItem("userCred"))?.email;
 
   const handleSignIn = (e) => {
     e.preventDefault();
-
     if (email && pass) {
       cred.forEach((data) => {
         if (data.email === email && data.password === pass) {
-          setSuccess("Valid credentials");
           localStorage.setItem(
             "userCred",
             JSON.stringify({
@@ -42,7 +40,8 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
           setPass("");
           setSuccess("");
           setUserDetails(true);
-          navigate("/");
+          setSuccess("Valid credentials");
+          window.location.reload();
         } else {
           setError("Enter valid credentials");
         }
@@ -50,12 +49,14 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
     }
   };
 
-  const handleLogOut = () => {
-    localStorage.setItem("userCred", "");
-    setCurrUser(localStorage.getItem("userCred"));
-    setUserDetails(false);
-    navigate("/");
-  };
+  // const handleLogOut = () => {
+  //   localStorage.setItem("userCred", "");
+  //   let ourCred = localStorage.getItem("userCred");
+  //   console.log("ou", ourCred, typeof ourCred, ourCred?.length);
+  //   // setCurrUser();
+  //   setUserDetails(false);
+  //   // navigate("/");
+  // };
 
   useEffect(() => {
     setCurrUser(localStorage.getItem("userCred"));
@@ -79,27 +80,26 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
       // setLoaded(!loaded);
     });
   }, []);
-  console.log(sprints);
-
-  console.log("curruser", currUser);
 
   return (
     <div className="my-calendar signIn">
-      {Object?.keys(currUser)?.length > 0 ? (
+      {currUser?.length > 0 ? (
         <>
-          {sprints?.length > 0 && client && (
+          {sprints?.length > 0 && client ? (
             <CompProfile
               sprints={sprints}
               userDetails={userDetails}
-              handleLogOut={handleLogOut}
+              // handleLogOut={handleLogOut}
               clients={client}
               cred={currUser}
               empData={empData}
             />
+          ) : (
+            <Loader />
           )}
         </>
       ) : (
-        <form onSubmit={(e) => handleSignIn(e)}>
+        <form>
           {success?.length > 0 ? (
             <p className="success-message__signIn">{success}</p>
           ) : (
@@ -124,6 +124,7 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
           <button
             type="submit"
             className="button__signIn btn-newClient-header__clientPage"
+            onClick={(e) => handleSignIn(e)}
           >
             Sign in
           </button>

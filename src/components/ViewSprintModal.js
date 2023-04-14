@@ -1,6 +1,4 @@
 import { useState } from "react";
-import Tab from "react-bootstrap/Tab";
-import Tabs from "react-bootstrap/Tabs";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
@@ -15,7 +13,12 @@ import {
   deleteWorkItemFromTable,
   fetchWorkItemsByJobId,
 } from "../controller/Airtable";
+import closeIcon from "../images/closeIcon.svg";
+import plusIconWhite from "../images/plusIconWhite.svg";
+import progressBar from "../images/progressBar.svg";
 import moment from "moment-timezone";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 function ViewSprintModal({
   modalState,
@@ -23,26 +26,34 @@ function ViewSprintModal({
   sprint,
   setModalState,
   employees,
-  logedUser,
   handleDeleteSprint,
 }) {
-  const [date, setDate] = useState(new Date().toLocaleDateString());
+  const [date, setDate] = useState();
   const [hours, setHours] = useState(0);
   const [employee, setEmployee] = useState(
     (sprint && sprint.employee.id) || ""
   );
   const [workItems, setworkItems] = useState([]);
+  const [isLiveJob, setIsLiveJob] = useState(true);
+  const [activeBtn, setActiveBtn] = useState(false);
+
+  const todaysDate = () => {
+    let date = new Date();
+    let todayDate = moment(date).format("YYYY-MM-DD");
+    setDate(todayDate);
+  };
 
   useEffect(() => {
     if (!sprint) return;
     console.log({ sprint });
     setEmployee((sprint && sprint.employee.id) || "");
-    console.log(`fetching timeTrack records for job ${sprint.job.id}`);
+    todaysDate();
     fetchWorkItemsByJobId(sprint.job.id).then((workItems) => {
       console.log({ workItems });
       setworkItems(workItems);
     });
   }, [sprint]);
+  console.log("work", workItems);
 
   const getUTCDate = (date) => {
     return moment.utc(date).format("DD/MM/YYYY");
@@ -56,11 +67,11 @@ function ViewSprintModal({
       </>
     );
   }
-  console.log("All the data are......", sprint);
   const handleAddWorkItem = async (sprintId, date, hours) => {
     console.log("handleAddWorkItem");
     console.log({ sprintId, date, hours });
     try {
+      console.log("dat", date);
       await addWorkItemToAirtable(sprintId, date, hours);
       const workItems = await fetchWorkItemsByJobId(sprint.job.id);
       setworkItems(workItems);
@@ -83,211 +94,276 @@ function ViewSprintModal({
     <>
       <Modal
         show={modalState === "view-modal"}
-        onHide={handleClose}
-        centered
-        className="view-sprint-modal"
+        // onHide={handleClose}
+        // onHide={() => setIsJobOpen(!isJobModalOpen)}
+        className="view-sprint-modal scheduleNewJobModal"
       >
-        <Modal.Header closeButton>
-          <Modal.Title>{sprint.job.name}</Modal.Title>
+        <Modal.Header>
+          <Modal.Title className="header__clientPageTitle">
+            {sprint.job.name}
+          </Modal.Title>
+          <div>
+            <button
+              className=" btn-newClient-header__clientPage"
+              onClick={() => setModalState("edit-modal")}
+              style={{ marginRight: "20px" }}
+            >
+              Edit
+            </button>
+            <button
+              className=" btn-newClient-header__clientPage"
+              style={{ backgroundColor: "red", marginRight: "20px" }}
+              onClick={() => handleDeleteSprint(sprint.id)}
+            >
+              <i className="fi fi-rr-trash"></i>
+            </button>
+            <button
+              className="closeIconBtn"
+              onClick={() => {
+                handleClose();
+              }}
+            >
+              <img src={closeIcon} alt="close icon" />
+            </button>
+          </div>
         </Modal.Header>
         <Modal.Body>
-          <Tabs
-            defaultActiveKey="jobInformation"
-            id="view-sprint-modal-tabs"
-            className="mb-3"
+          <div
+            className="btnGroup-header__clientPage"
+            style={{ width: "fit-content" }}
           >
-            {/* Job Info Tab */}
-            <Tab eventKey="jobInformation" title="Job Information">
-              <Row className="mb-2">
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Client: </strong>
-                    <div>{sprint.job.client.name}</div>
-                  </Stack>
-                </Col>
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Job Code:</strong>
-                    <div>{sprint?.job?.job_code}</div>
-                  </Stack>
-                </Col>
-              </Row>
-              <Row className="mb-2">
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Sub Brand: </strong>
-                    <div>{sprint?.job?.subBrand}</div>
-                  </Stack>
-                </Col>
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Job Name:</strong>
-                    <div>{sprint?.job?.name}</div>
-                  </Stack>
-                </Col>
-              </Row>
-              <hr></hr>
-              <Row className="mb-2">
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Date From: </strong>
-                    <div>{sprint?.start}</div>
-                  </Stack>
-                </Col>
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Date To:</strong>
-                    <div>{sprint?.end}</div>
-                  </Stack>
-                </Col>
-              </Row>
-              <Row className="mb-2">
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Time Allocated: </strong>
-                    <div>{sprint?.job?.timeAllocated} hours</div>
-                  </Stack>
-                </Col>
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Employee:</strong>
-                    <div>{sprint?.employee?.firstName}</div>
-                  </Stack>
-                </Col>
-              </Row>
-              <Row className="p-2">
-                <Alert variant="secondary">
-                  <div>{sprint?.job?.description}</div>
-                </Alert>
-              </Row>
-            </Tab>
-            {/* Time Tracking Tab */}
-            <Tab eventKey="timeTracking" title="Time Tracking">
-              <Row>
-                {/* Add Work Item Form */}
-                <Col>
-                  <Form>
-                    <Form.Group
-                      className="mb-2"
-                      controlId="addTimeFormEmployee"
+            <button
+              onClick={() => {
+                setActiveBtn(false);
+                setIsLiveJob(true);
+              }}
+              style={
+                activeBtn === false
+                  ? { backgroundColor: "#20e29f", fontWeight: "600" }
+                  : { backgroundColor: "#d8d2d1" }
+              }
+            >
+              Job Information
+            </button>
+            <button
+              onClick={() => {
+                setActiveBtn(true);
+                setIsLiveJob(false);
+              }}
+              style={
+                activeBtn === true
+                  ? { backgroundColor: "#20e29f", fontWeight: "600" }
+                  : { backgroundColor: "#d8d2d1" }
+              }
+            >
+              Time Tracking
+            </button>
+          </div>
+          <div className="viewSprint-inner-modal">
+            {isLiveJob ? (
+              <Form onSubmit={(e) => e.preventDefault()}>
+                <Row className="mb-2">
+                  <Col>
+                    <Stack direction="horizontal" gap={2}>
+                      <strong>Client: </strong>
+                      <p>{sprint.job.client.name}</p>
+                    </Stack>
+                  </Col>
+                  <Col>
+                    <Stack direction="horizontal" gap={2}>
+                      <strong>Job Code:</strong>
+                      <p>{sprint?.job?.job_code}</p>
+                    </Stack>
+                  </Col>
+                </Row>
+                <Row className="mb-2">
+                  <Col>
+                    <Stack direction="horizontal" gap={2}>
+                      <strong>Sub Brand: </strong>
+                      <p>{sprint?.job?.subBrand}</p>
+                    </Stack>
+                  </Col>
+                  <Col>
+                    <Stack direction="horizontal" gap={2}>
+                      <strong>Job Name:</strong>
+                      <p>{sprint?.job?.name}</p>
+                    </Stack>
+                  </Col>
+                </Row>
+                <hr></hr>
+                <Row className="mb-2">
+                  <Col>
+                    <Stack direction="horizontal" gap={2}>
+                      <strong>Date From: </strong>
+                      <p>{sprint?.start}</p>
+                    </Stack>
+                  </Col>
+                  <Col>
+                    <Stack direction="horizontal" gap={2}>
+                      <strong>Date To:</strong>
+                      <p>{sprint?.end}</p>
+                    </Stack>
+                  </Col>
+                </Row>
+                <Row className="mb-2">
+                  <Col>
+                    <Stack direction="horizontal" gap={2}>
+                      <strong>Time Allocated: </strong>
+                      <p>{sprint?.job?.timeAllocated} hours</p>
+                    </Stack>
+                  </Col>
+                  <Col>
+                    <Stack direction="horizontal" gap={2}>
+                      <strong>Employee:</strong>
+                      <p>{sprint?.employee?.firstName}</p>
+                    </Stack>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <p>{sprint?.job?.description}</p>
+                  </Col>
+                </Row>
+              </Form>
+            ) : (
+              <Form onSubmit={(e) => e.preventDefault()}>
+                <Row>
+                  <Col>
+                    <Form
+                      className="detailsForm-viewSprint"
+                      onSubmit={(e) => e.preventDefault()}
                     >
-                      <Form.Label className="mb-0">
-                        <strong>Employee:</strong>
-                      </Form.Label>
-                      <Form.Select
-                        disabled
-                        defaultValue={sprint.employee.id}
-                        onChange={(e) => {
-                          setEmployee(e.target.value);
-                        }}
-                        aria-label="Select Employee"
+                      <Form.Group
+                        className="mb-2 inputContainer"
+                        controlId="addTimeFormEmployee"
                       >
-                        {employees &&
-                          employees.map((employee) => {
-                            return (
-                              <option key={employee?.id} value={employee?.id}>
-                                {`${employee?.firstName} ${employee?.surname}`}
-                              </option>
-                            );
-                          })}
-                      </Form.Select>
-                    </Form.Group>
-                    <Form.Group className="mb-2" controlId="addTimeFormDate">
-                      <Form.Label className="mb-0">
-                        <strong>Date:</strong>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        onFocus={(e) => (e.target.type = "date")}
-                        onChange={(e) => {
-                          setDate(e.target.value);
-                        }}
-                        defaultValue={date}
-                        placeholder={date}
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-2" controlId="addTimeFormHours">
-                      <Form.Label className="mb-0">
-                        <strong>Hours:</strong>
-                      </Form.Label>
-                      <Form.Control
-                        type="number"
-                        defaultValue={hours}
-                        onChange={(e) => {
-                          let h = parseInt(e.target.value, 10);
-                          setHours(h);
-                        }}
-                        value={hours}
-                        placeholder={hours}
-                        min={0}
-                      />
-                    </Form.Group>
-                  </Form>
-
-                  <Button
-                    variant="success"
-                    onClick={() => {
-                      handleAddWorkItem(sprint.id, date, hours);
-                    }}
-                  >
-                    Add Time
-                  </Button>
-                </Col>
-                {/* Time Worked Graph Col */}
-                <Col>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Time Worked: </strong>
-                    <div>
-                      {workItems.reduce((acc, val) => {
-                        return acc + val.hours;
-                      }, 0)}{" "}
-                      hours
-                    </div>
-                  </Stack>
-                  <Stack direction="horizontal" gap={2}>
-                    <strong>Time Allocated: </strong>
-                    <div>{sprint?.job?.timeAllocated} hours</div>
-                  </Stack>
-                </Col>
-              </Row>
-              <hr></hr>
-              <Row>
-                {workItems &&
-                  workItems.map((workItem) => {
-                    return (
-                      <Stack
-                        key={workItem.id}
-                        className="mb-2"
-                        direction="horizontal"
-                        gap={4}
+                        <Form.Label className="mb-0">
+                          <strong>Name</strong>
+                        </Form.Label>
+                        <Form.Select
+                          className="commonInpStyleNewJob"
+                          disabled
+                          defaultValue={sprint.employee.id}
+                          onChange={(e) => {
+                            setEmployee(e.target.value);
+                          }}
+                          aria-label="Select Employee"
+                        >
+                          {employees &&
+                            employees.map((employee) => {
+                              return (
+                                <option key={employee?.id} value={employee?.id}>
+                                  {`${employee?.firstName} ${employee?.surname}`}
+                                </option>
+                              );
+                            })}
+                        </Form.Select>
+                      </Form.Group>
+                      <Form.Group
+                        className="mb-2 inputContainer"
+                        controlId="addTimeFormDate"
                       >
-                        <strong>{workItem?.employee?.firstName}: </strong>
-                        <div>{getUTCDate(workItem?.dateOfWork)}</div>
-                        <div>{workItem.hours} hours</div>
-                        <CloseButton
-                          onClick={() => handleDeleteWorkItem(workItem?.id)}
+                        <Form.Label className="mb-0">
+                          <strong>Date </strong>
+                        </Form.Label>
+                        <Form.Control
+                          className="commonInpStyleNewJob"
+                          type="text"
+                          onFocus={(e) => (e.target.type = "date")}
+                          onChange={(e) => {
+                            console.log("date", e.target.value);
+                            setDate(e.target.value);
+                          }}
+                          defaultValue={moment(date).format("DD/MM/YYYY")}
+                          placeholder={"DD/MM/YY"}
                         />
-                      </Stack>
-                    );
-                  })}
-              </Row>
-            </Tab>
-          </Tabs>
+                      </Form.Group>
+                      <Form.Group
+                        className="mb-2 inputContainer"
+                        controlId="addTimeFormHours"
+                      >
+                        <Form.Label className="mb-0">
+                          <strong>Hours </strong>
+                        </Form.Label>
+                        <Form.Control
+                          className="commonInpStyleNewJob"
+                          type="number"
+                          defaultValue={hours}
+                          onChange={(e) => {
+                            let h = parseInt(e.target.value, 10);
+                            setHours(h);
+                          }}
+                          value={hours}
+                          placeholder={"0"}
+                          min={0}
+                        />
+
+                        <button
+                          className="addHours"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddWorkItem(sprint.id, date, hours);
+                          }}
+                        >
+                          <img src={plusIconWhite} alt="plus icon" />
+                        </button>
+                      </Form.Group>
+                    </Form>
+                  </Col>
+
+                  <Col>
+                    <p style={{ textAlign: "center" }}>
+                      <strong>Estimated Time : </strong>
+                      {sprint?.job?.timeAllocated} hours
+                    </p>
+                    <div className="progressCont">
+                      <p>Time remaining</p>
+                      <p>
+                        {parseInt(sprint?.job?.timeAllocated) -
+                          parseInt(
+                            workItems.reduce((acc, val) => {
+                              return acc + val.hours;
+                            }, 0)
+                          )}
+                      </p>
+                      <p>Hours</p>
+                      <CircularProgressbar
+                        value={parseInt(
+                          workItems.reduce((acc, val) => {
+                            return acc + val.hours;
+                          }, 0)
+                        )}
+                        maxValue={sprint?.job?.timeAllocated}
+                        strokeWidth={18}
+                      />
+                    </div>
+                  </Col>
+                </Row>
+                <hr></hr>
+                <Row>
+                  {workItems &&
+                    workItems.map((workItem) => {
+                      return (
+                        <Stack
+                          key={workItem.id}
+                          className="mb-2"
+                          direction="horizontal"
+                          gap={4}
+                        >
+                          <strong>{workItem?.employee?.firstName}: </strong>
+                          <p>{getUTCDate(workItem?.dateOfWork)}</p>
+                          <p>{workItem.hours} hours</p>
+                          <CloseButton
+                            onClick={() => handleDeleteWorkItem(workItem?.id)}
+                          />
+                        </Stack>
+                      );
+                    })}
+                </Row>
+              </Form>
+            )}
+          </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setModalState("edit-modal")}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="danger"
-            onClick={() => handleDeleteSprint(sprint.id)}
-          >
-            <i className="fi fi-rr-trash"></i>
-          </Button>
-        </Modal.Footer>
       </Modal>
     </>
   );

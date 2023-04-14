@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Col, Modal, ModalBody, ModalHeader, Row, Form } from "react-bootstrap";
 import closeIcon from "../images/closeIcon.svg";
+import employeeSvg from "../images/employeeSvg.svg";
 import cake from "../images/cake.png";
 import cal from "../images/cal.png";
 import call from "../images/call.png";
 import start from "../images/start.png";
 import location from "../images/location.png";
 import AddResourceModal from "./AddResourceModal";
-
-export let ourEmpData = {};
 
 function EmpProfile({
   setShowEmpProfile,
@@ -17,7 +16,8 @@ function EmpProfile({
   empData,
   showResourceForm,
   setShowResourceForm,
-  setViewedEmp,
+
+  handleSelectedEmp,
 }) {
   const [activeBtn, setActiveBtn] = useState(false);
   const [ourEmp, setOurEmp] = useState([]);
@@ -25,11 +25,12 @@ function EmpProfile({
   const handlEmpDetails = () => {
     const filteredData = empData?.filter((data) => data?.id === empId);
     setOurEmp(filteredData[0]);
+    handleSelectedEmp(filteredData[0]);
   };
   useEffect(() => {
     handlEmpDetails();
   }, []);
-  console.log(ourEmp);
+  console.log("OurEmp", ourEmp);
   return (
     <>
       <Modal show={showEmpProfile} className="createNewClient">
@@ -45,9 +46,7 @@ function EmpProfile({
               style={{ backgroundColor: "#9d9d9d" }}
               onClick={() => {
                 setShowResourceForm(!showResourceForm);
-                ourEmpData = ourEmp;
-                // localStorage.setItem("empDetails", JSON.stringify(ourEmp));
-                // setShowEmpProfile(!showEmpProfile);
+                handleSelectedEmp(ourEmp);
               }}
             >
               edit
@@ -97,29 +96,26 @@ function EmpProfile({
                 <div className="personCont__empProfile">
                   <div className="profile-personCont__empProfile">
                     <img
-                      src="https://image.cnbcfm.com/api/v1/image/106930629-1629399630371-gettyimages-494691340-87856868.jpeg?v=1629399760&w=740&h=416&ffmt=webp&vtcrop=y"
+                      src={employeeSvg}
                       alt="empImage"
                       className="personImage"
+                      style={{ backgroundColor: `${ourEmp?.colour}80` }}
                     />
                     <div>
-                      <h2>
-                        {ourEmp?.firstName ? ourEmp?.firstName : "Jack ford"}
-                      </h2>
-                      <h5>{ourEmp?.title ? ourEmp?.title : "title"}</h5>
+                      <h2>{ourEmp?.firstName ? ourEmp?.firstName : "NAME"}</h2>
+                      <h5>{ourEmp?.title ? ourEmp?.title : "TITLE"}</h5>
                       <div className="Cont__empProfile">
                         <div className="commonCont-personCont__empProfile">
                           <div className="common-personCont__empProfile">
                             <img src={call} alt="call" />
-                            <p>
-                              {ourEmp?.number ? ourEmp?.number : "9999999999"}
-                            </p>
+                            <p>{ourEmp?.number ? ourEmp?.number : "Contact"}</p>
                           </div>
                           <div className="common-personCont__empProfile">
                             <img src={start} alt="start" />
                             <p>
                               {ourEmp?.startedDate
                                 ? ourEmp?.startedDate
-                                : "18/12/23"}
+                                : "DD/MM/YY"}
                             </p>
                           </div>
                         </div>
@@ -129,15 +125,12 @@ function EmpProfile({
                             <p>
                               {ourEmp?.dateOfBirth
                                 ? ourEmp?.dateOfBirth
-                                : "18/12/23"}
+                                : "DD/MM/YY"}
                             </p>
                           </div>
                           <div className="common-personCont__empProfile">
                             <img src={cal} alt="start" />
-                            <p>
-                              {" "}
-                              {ourEmp?.holiday ? ourEmp?.holiday : "XX days"}
-                            </p>
+                            <p> {ourEmp?.holiday ? ourEmp?.holiday : "days"}</p>
                           </div>
                         </div>
 
@@ -145,9 +138,7 @@ function EmpProfile({
                           <div className="common-personCont__empProfile">
                             <img src={location} alt="call" />
                             <p>
-                              {ourEmp?.address
-                                ? ourEmp?.address
-                                : " 1w4dBoxworks Clocktower Yard Temple Gate Bristol BS1 6QH"}
+                              {ourEmp?.address ? ourEmp?.address : "address"}
                             </p>
                           </div>
                         </div>
@@ -169,7 +160,7 @@ function EmpProfile({
           </Form>
         </ModalBody>
       </Modal>
-      {showResourceForm && <AddResourceModal ourEmp={ourEmp} />}
+      {showResourceForm && <AddResourceModal handleData={() => ourEmp} />}
     </>
   );
 }

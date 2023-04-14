@@ -13,10 +13,13 @@ import mobileLogo from "../images/holla-mobile-logo.svg";
 const Navbar = ({ userDetails }) => {
   const [hover, setHover] = useState(false);
   const location = useLocation();
-  const [cred, setCred] = useState({});
+  const [cred, setCred] = useState("");
 
   const handleCredDetails = () => {
-    setCred(localStorage?.getItem("userCred"));
+    let data = localStorage?.getItem("userCred");
+    if (data) {
+      setCred(data);
+    }
   };
   useEffect(() => {
     handleCredDetails();
@@ -30,11 +33,11 @@ const Navbar = ({ userDetails }) => {
     >
       <div className="headerTop-content__container">
         <Link className="logo__sideBar" to="/">
-          {hover ? (
+          {hover === true ? (
             <img className="logo-with-hover" src={logo} alt="holo logo" />
           ) : (
             <img
-              className="logo-without-hover"
+              className="logo-without-hover mobile-nav-logo"
               src={mobileLogo}
               alt="holo logo"
             />
@@ -53,8 +56,8 @@ const Navbar = ({ userDetails }) => {
                   : { color: "#858686", backgroundColor: "transparent" }
               }
               className={`${
-                location.pathname === "/client" ? "active-link" : ""
-              }${hover === true ? " showArrow" : ""}`}
+                location.pathname === "/client" ? "showArrowGreen" : "showArrow"
+              }`}
             >
               {location.pathname === "/client" ? (
                 <img src={clientSvgGreen} alt="client svg icon" />
@@ -69,15 +72,15 @@ const Navbar = ({ userDetails }) => {
             <Link
               to="/"
               style={
-                location.pathname === "/"
+                location.pathname === "/" || location.pathname === "/#/"
                   ? {
                       color: " #20e29f",
                       backgroundColor: "#f5f5f5",
                     }
                   : { color: "#858686", backgroundColor: "transparent" }
               }
-              className={`${location.pathname === "/" ? "active-link" : ""}${
-                hover === true ? " showArrow" : ""
+              className={`${
+                location.pathname === "/" ? "showArrowGreen" : "showArrow"
               }`}
             >
               {location.pathname === "/" ? (
@@ -105,7 +108,7 @@ const Navbar = ({ userDetails }) => {
         </div>
         <div className="userDetailsCont__sideBar">
           <Link to="/signin" style={{ width: "fit-content" }}>
-            {Object?.keys(cred)?.length > 1 ? (
+            {cred?.length > 0 ? (
               <div className="userDetails__sideBar">
                 <p>{JSON.parse(cred)?.email?.slice(0, 1)}</p>
               </div>
