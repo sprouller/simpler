@@ -38,21 +38,17 @@ function AddResourceModal({
       des,
       color,
     };
-    if (Object?.keys(viewedEmp)?.length > 0) {
+    if (viewedEmp && Object?.keys(viewedEmp)?.length > 0) {
       console.log("inEdit");
 
       addNewEmployee(resourceData, null, viewedEmp?.id);
     } else {
       console.log("in new create mode");
 
-      if (name?.length > 0 && des?.length > 0 && color?.length > 0) {
-        activeBtn
-          ? addNewEmployee(utilityData, activeBtn)
-          : addNewEmployee(resourceData, activeBtn);
-        setShowResourceForm(!showResourceForm);
-      } else {
-        alert("Ensure that all fields are filled out");
-      }
+      activeBtn
+        ? addNewEmployee(utilityData, activeBtn)
+        : addNewEmployee(resourceData, activeBtn);
+      setShowResourceForm(!showResourceForm);
     }
   };
 

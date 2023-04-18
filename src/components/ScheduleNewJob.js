@@ -147,20 +147,10 @@ function ScheduleNewJob({
                   thirdPartyItem,
                   thirdPartyCost,
                 };
-                if (
-                  start &&
-                  end &&
-                  jobName &&
-                  jobCode &&
-                  employeeId &&
-                  clientId &&
-                  subBrand
-                ) {
-                  handleScheduleJob(job, sprint);
-                  setShowScheduleJobModal(!showScheduleJobModal);
-                } else {
-                  alert("Ensure that all fields are filled out");
-                }
+
+                handleScheduleJob(job, sprint);
+                setShowScheduleJobModal(!showScheduleJobModal);
+
                 setStart("");
                 setEnd("");
                 setJobName("");

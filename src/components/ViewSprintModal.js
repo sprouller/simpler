@@ -7,7 +7,6 @@ import Col from "react-bootstrap/Col";
 import Stack from "react-bootstrap/Stack";
 import CloseButton from "react-bootstrap/CloseButton";
 import { useEffect } from "react";
-import { Alert } from "react-bootstrap";
 import {
   addWorkItemToAirtable,
   deleteWorkItemFromTable,

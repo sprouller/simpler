@@ -79,6 +79,10 @@ const BasicCalendar = ({ handleClient }) => {
   const [outOfOfficeData, setOutOfOfficeData] = useState([]);
   const [filteredOutOfOfficeData, setFilteredOutOfOfficeData] = useState([]);
   const [eventFltClicked, setIsEventFltClicked] = useState(false);
+  const [fourWeekDate, setFourWeekDate] = useState({
+    startWDate: null,
+    endWDate: null,
+  });
   useEffect(() => {
     fetchSprints().then((sprintsFromAirtable) => {
       setSprints(sprintsFromAirtable);
@@ -357,7 +361,9 @@ const BasicCalendar = ({ handleClient }) => {
       });
     }
   }
-  const handleRangeChange = ({ start, end }) => {
+  const handleRangeChange = (start, end) => {
+    start = fourWeekDate.startWDate;
+    end = fourWeekDate.endWDate;
     return { start, end };
   };
   const handleUtilData = (typeOfUtil) => {
@@ -388,7 +394,13 @@ const BasicCalendar = ({ handleClient }) => {
     }
   };
 
+  const handleNavigate = (e) => {
+    console.log("event", e);
+    return fourWeekDate.endWDate;
+  };
+
   console.log("filter", filteredOutOfOfficeData, eventFltClicked);
+  console.log("currentView", currentView);
 
   return (
     <div className="my-calendar">
@@ -445,8 +457,14 @@ const BasicCalendar = ({ handleClient }) => {
                   // setCurrentView("4 weeks");
                   const today = new Date();
                   const fourWeeksLater = moment(today).add(4, "weeks").toDate();
+                  console.log("four week Later", fourWeeksLater);
+                  setFourWeekDate({
+                    startWDate: today,
+                    endWDate: fourWeeksLater,
+                  });
                   setCurrentView("month");
-                  handleRangeChange(today, fourWeeksLater);
+                  handleNavigate();
+                  // handleRangeChange(today, fourWeeksLater);
                   setFilteredOutOfOfficeData([]);
                 }}
               >
@@ -616,11 +634,14 @@ const BasicCalendar = ({ handleClient }) => {
           min={dates.firstDay}
           max={dates.lastDay}
           selectable
-          onRangeChange={handleRangeChange}
+          // onRangeChange={(e) => {
+          //   handleRangeChange(e.start, e.end);
+          // }}
           onSelectSlot={handleSlotSelectEvent}
           onSelectEvent={handleOnSelectEvent}
           onEventDrop={moveEventHandler}
           resizable
+          onNavigate={handleNavigate}
           onEventResize={(e) => {
             handleResizeEvent(e, e?.start, e?.end);
           }}

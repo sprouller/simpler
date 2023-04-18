@@ -13,7 +13,9 @@ function Loader() {
   return isAvailable ? (
     <ScaleLoader className="loader" color="#20e29f" />
   ) : (
-    <p className="loader">Data not found</p>
+    <p className="loader" style={{ textAlign: "center" }}>
+      Data not found
+    </p>
   );
 }
 

@@ -296,7 +296,7 @@ function ViewJob({ setIsJobOpen, isJobModalOpen, job, sprint, employee }) {
                             direction="horizontal"
                             gap={4}
                           >
-                            {/* <strong>{workItem?.employee?.firstName}: </strong> */}
+                            <strong>{workItem?.employee?.firstName}: </strong>
                             <p>{getUTCDate(workItem?.dateOfWork)}</p>
                             <p>{workItem.hours} hours</p>
                             <CloseButton

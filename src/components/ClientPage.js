@@ -178,8 +178,8 @@ function ClientPage() {
         </div>
       )}
 
-      {/* {activeBtn === true && ( */}
-      {/* <div className="archivedClient__clientPage">
+      {activeBtn === true && (
+        <div className="archivedClient__clientPage">
           <p>Archived clients</p>
           <div className="searchContainer-detailsContainer__clientPage">
             <img src={searchIcon} alt="search icon" />
@@ -198,11 +198,11 @@ function ClientPage() {
           <div className="dataContainer-detailsContainer__clientPage">
             <div className="data-detailsContainer__clientPage">
               <img src={defaultImage} alt={"test clt"} />
-              <p>{"Test client"}</p>
+              <p style={{ fontSize: "12px" }}>{"Test client"}</p>
             </div>
           </div>
-        </div> */}
-      {/* )} */}
+        </div>
+      )}
 
       {showClientModal && (
         <CreateNewClient show={showClientModal} setShow={setShowClientModal} />

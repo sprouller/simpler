@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Form, Modal, ModalBody, ModalHeader, Row } from "react-bootstrap";
 import closeIcon from "../images/closeIcon.svg";
 import plusIconWhite from "../images/plusIconWhite.svg";
 import minusIcon from "../images/minus-white.svg";
-import { editClient } from "../controller/Airtable";
+import { editClient, editClientToAirtable } from "../controller/Airtable";
 import moment from "moment-timezone";
 
 function EditClientModal({ showEditClientModal, editCltModal, clt }) {
@@ -13,15 +13,33 @@ function EditClientModal({ showEditClientModal, editCltModal, clt }) {
   const [activeBtn, setActiveBtn] = useState(
     clt.client_type === "Retainer" ? true : false
   );
-  const [clientType, setClientType] = useState("");
+  const [clientType, setClientType] = useState(
+    clt?.client_type?.length > 0 ? clt?.client_type : "Project based"
+  );
   const [subClientArr, setSubClientArr] = useState(clt.subbrand);
-
+  const [mothTimeAllocation, setMonthTimeAllocation] = useState(
+    clt?.month_time_allocation?.length > 0 ? clt?.month_time_allocation : ""
+  );
+  const [date, setDate] = useState(
+    clt?.retainer_add_job_date?.length > 0 ? clt?.retainer_add_job_date : ""
+  );
+  const [radioVal, setRadioVal] = useState(
+    clt?.ratiner_period?.length > 0 ? clt?.ratiner_period : "3 months"
+  );
+  console.log("clients", clt);
   const handleDelete = (eachClient) => {
     const filterArr = subClientArr.filter((data, index) => data !== eachClient);
     setSubClientArr(filterArr);
   };
 
-  console.log("client", clt, description);
+  const getStartDateText = (e) => {
+    const date = new Date();
+    if (e) {
+      return moment.utc(e).format("DD/MM/YY");
+    }
+
+    return moment.utc(date).format("DD/MM/YY");
+  };
 
   return (
     <>
@@ -38,39 +56,38 @@ function EditClientModal({ showEditClientModal, editCltModal, clt }) {
                 let today = new Date();
                 today = moment.utc(today).format("DD/MM/YYYY");
 
-                if (subClientArr && description && clientType && client) {
-                  let subCltArr = [];
-                  let clientDetails;
-                  subClientArr.forEach((data) => {
-                    clientDetails = {
-                      clientType,
-                      subClient: subCltArr.push(data),
-                      description,
-                      client,
-                      createdAt: today,
-                      // compLogo,
-                    };
-                  });
+                let subCltArr = [];
+                let clientDetails;
+                subClientArr.forEach((data) => {
                   clientDetails = {
                     clientType,
-                    subClient: subCltArr,
+                    subClient: subCltArr.push(data),
                     description,
                     client,
                     createdAt: today,
                     // compLogo,
                   };
+                });
+                clientDetails = {
+                  clientType,
+                  subClient: subCltArr,
+                  description,
+                  client,
+                  createdAt: today,
+                  mothTimeAllocation,
+                  date,
+                  radioVal,
+                  // compLogo,
+                };
 
-                  let cltId = editClient(clientDetails, clt?.id);
-                  if (cltId) {
-                    showEditClientModal(!editCltModal);
+                let cltId = editClientToAirtable(clientDetails, clt?.id);
+                if (cltId) {
+                  showEditClientModal(!editCltModal);
 
-                    setClient("");
-                    setSubClientArr([]);
-                    setDescription("");
-                    setClientType("");
-                  }
-                } else {
-                  alert("Make sure you will fill all the fields");
+                  setClient("");
+                  setSubClientArr([]);
+                  setDescription("");
+                  setClientType("");
                 }
               }}
             >
@@ -187,6 +204,129 @@ function EditClientModal({ showEditClientModal, editCltModal, clt }) {
                 </div>
               </Col>
             </Row>
+            {activeBtn === true && (
+              <>
+                <Row
+                  className="mx-2 py-3"
+                  style={{ borderTop: "1px solid #ededed" }}
+                >
+                  <Col>
+                    <Form.Group className="formGroup__CNC">
+                      <Form.Label className="fieldTitle__scheduleNewJobModal">
+                        Monthly time allocation
+                      </Form.Label>
+                      <Form.Control
+                        className="commonInpStyleNewJob mt-1"
+                        type="text"
+                        value={mothTimeAllocation}
+                        onChange={(e) => setMonthTimeAllocation(e.target.value)}
+                        placeholder={"XX hours"}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group className="formGroup__CNC">
+                      <Form.Label
+                        className="fieldTitle__scheduleNewJobModal"
+                        style={{ marginRight: "10px", marginBottom: "0" }}
+                      >
+                        Date added
+                      </Form.Label>
+                      <Form.Control
+                        className="commonInpStyleNewJob"
+                        type="text"
+                        onFocus={(e) => (e.target.type = "date")}
+                        onChange={(e) => {
+                          let newStartDate = getStartDateText(e.target.value);
+                          setDate(newStartDate);
+                        }}
+                        defaultValue={clt?.retainer_add_job_date}
+                        placeholder={getStartDateText()}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row className="mx-2">
+                  <Form.Group className="formGroup__CNC mb-3">
+                    <Form.Label className="fieldTitle__scheduleNewJobModal">
+                      Period
+                    </Form.Label>
+                    <div className="d-flex flex-wrap">
+                      <button
+                        className=" btn-newClient-header__clientPage m-2"
+                        style={
+                          radioVal === "3 months"
+                            ? { background: "#20e29f" }
+                            : { background: "#9D9D9D" }
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setRadioVal("3 months");
+                        }}
+                      >
+                        3 months
+                      </button>
+                      <button
+                        className=" btn-newClient-header__clientPage m-2"
+                        style={
+                          radioVal === "6 months"
+                            ? { background: "#20e29f" }
+                            : { background: "#9D9D9D" }
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setRadioVal("6 months");
+                        }}
+                      >
+                        6 months
+                      </button>
+                      <button
+                        className=" btn-newClient-header__clientPage m-2"
+                        style={
+                          radioVal === "12 months"
+                            ? { background: "#20e29f" }
+                            : { background: "#9D9D9D" }
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setRadioVal("12 months");
+                        }}
+                      >
+                        12 months
+                      </button>
+                      <button
+                        className=" btn-newClient-header__clientPage m-2"
+                        style={
+                          radioVal === "18 months"
+                            ? { background: "#20e29f" }
+                            : { background: "#9D9D9D" }
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setRadioVal("18 months");
+                        }}
+                      >
+                        18 months
+                      </button>
+                      <button
+                        className=" btn-newClient-header__clientPage m-2"
+                        style={
+                          radioVal === "24 months"
+                            ? { background: "#20e29f" }
+                            : { background: "#9D9D9D" }
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setRadioVal("24 months");
+                        }}
+                      >
+                        24 months
+                      </button>
+                    </div>
+                  </Form.Group>
+                </Row>
+              </>
+            )}
             <Row
               className="mx-2 py-3"
               style={{ borderTop: "1px solid #ededed" }}

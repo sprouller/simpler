@@ -15,7 +15,7 @@ function CreateNewClient({ show, setShow, jobs }) {
   const [description, setDescription] = useState("");
   const [compLogo, setCompLogo] = useState({});
   const [cltId, setCltId] = useState("");
-  const [mothTimeAllocation, setMonthTimeAllocation] = useState("");
+  const [monthTimeAllocation, setMonthTimeAllocation] = useState("");
   const [date, setDate] = useState("");
   const [radioVal, setRadioVal] = useState("3 months");
 
@@ -68,6 +68,9 @@ function CreateNewClient({ show, setShow, jobs }) {
                   description,
                   client,
                   createdAt: today,
+                  monthTimeAllocation,
+                  date,
+                  radioVal,
                   // compLogo,
                 };
 
@@ -322,7 +325,7 @@ function CreateNewClient({ show, setShow, jobs }) {
                   <Form.Control
                     className="commonInpStyleNewJob mt-1"
                     type="text"
-                    value={mothTimeAllocation}
+                    value={monthTimeAllocation}
                     onChange={(e) => setMonthTimeAllocation(e.target.value)}
                     placeholder={"XX hours"}
                   />

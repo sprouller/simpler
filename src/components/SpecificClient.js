@@ -1,7 +1,11 @@
 import moment from "moment-timezone";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { fetchClients, fetchJobs } from "../controller/Airtable";
+import {
+  fetchClients,
+  fetchJobs,
+  fetchWorkItemsByJobId,
+} from "../controller/Airtable";
 import flower from "../images/flower-green.svg";
 import pdf from "../images/pdf.svg";
 import refreshIcon from "../images/refreshIcon.svg";
@@ -23,6 +27,7 @@ function SpecificClient({ sprint }) {
   const [filterThirdJobs, setFiltersThirdJob] = useState([]);
   const [allJobs, setAllJobs] = useState([]);
   const [isJobFetch, setIsJobFetch] = useState(false);
+  const [workItem, setAllWorkItem] = useState([]);
   const getDetails = async () => {
     fetchClients()
       .then((data) => {
@@ -35,16 +40,23 @@ function SpecificClient({ sprint }) {
       .catch((e) => console.log(e));
   };
 
-  const filterJobsWithClt = () =>
+  const filterJobsWithClt = () => {
+    const workItemArr = [];
     isLoaded &&
-    clt?.jobs?.forEach((jobId) => {
-      allJobs?.forEach((singleJob) => {
-        if (jobId === singleJob?.id) {
-          setJobWithClt((prevState) => [...prevState, singleJob]);
-          setFiltersJob((prevState) => [...prevState, singleJob]);
-        }
+      clt?.jobs?.forEach((jobId) => {
+        allJobs?.forEach((singleJob) => {
+          if (jobId === singleJob?.id) {
+            setJobWithClt((prevState) => [...prevState, singleJob]);
+            setFiltersJob((prevState) => [...prevState, singleJob]);
+            fetchWorkItemsByJobId(jobId)
+              .then((data) => setAllWorkItem((prev) => [...prev, data]))
+              .catch((e) => console.log(e));
+          }
+        });
       });
-    });
+
+    // setAllWorkItem(workItemArr);
+  };
 
   const filterSearchJob = (e, type) => {
     console.log("data", e.target.value);
@@ -79,6 +91,7 @@ function SpecificClient({ sprint }) {
       fetchJobs()
         .then((jobs) => {
           setAllJobs(jobs);
+          // console.log("Jobs", jobs);
           setIsLoaded(true);
         })
         .catch((e) => console.log(e));
@@ -89,55 +102,57 @@ function SpecificClient({ sprint }) {
     isLoaded === true && filterJobsWithClt();
   }, [isLoaded]);
 
-  console.log("Client details", filterJobs);
+  console.log("Client details", filterJobs, clt, workItem);
   return (
     <>
-      {jobWithClt?.length > 0 ? (
-        <div className="clientPage">
-          <div className="header__clientPage">
-            <div className="d-flex" style={{ alignItems: "center" }}>
-              {clt?.comp_logo ? (
-                <img
-                  width="30px"
-                  height="30px"
-                  src={clt?.comp_logo[0]?.url}
-                  alt={clt.name}
-                />
-              ) : (
-                <img width="30px" height="30px" src={flower} alt={clt.name} />
-              )}
-              <p className="mx-3 header__clientPageTitle">{clt.name}</p>
-            </div>
-            <div className="rightPart-header__clientPage">
-              <button
-                className="edit-client__clientPage"
+      <div className="clientPage">
+        <div className="header__clientPage">
+          <div className="d-flex" style={{ alignItems: "center" }}>
+            {clt?.comp_logo ? (
+              <img
+                width="30px"
+                height="30px"
+                src={clt?.comp_logo[0]?.url}
+                alt={clt.name}
+              />
+            ) : (
+              <img width="30px" height="30px" src={flower} alt={clt.name} />
+            )}
+            <p className="mx-3 header__clientPageTitle">{clt.name}</p>
+          </div>
+          <div className="rightPart-header__clientPage">
+            <button
+              className="edit-client__clientPage"
+              onClick={() => {
+                showEditClientModal(!editCltModal);
+              }}
+            >
+              edit client
+            </button>
+            <button
+              className="btn-newClient-header__clientPage "
+              style={{ background: "#9D9D9D" }}
+              onClick={() => navigate("/client")}
+            >
+              Back
+            </button>
+            <button className="btn-newClient-header__clientPage mx-3 mb-0 ">
+              <img src={pdf} alt="pdf image" />
+              PDF
+            </button>
+            <div className="refreshIcon-header__clientPage">
+              <img
+                src={refreshIcon}
+                alt="refresh icon"
                 onClick={() => {
-                  showEditClientModal(!editCltModal);
+                  getDetails();
+                  filterJobsWithClt();
                 }}
-              >
-                edit client
-              </button>
-              <button
-                className="btn-newClient-header__clientPage "
-                style={{ background: "#9D9D9D" }}
-                onClick={() => navigate("/client")}
-              >
-                Back
-              </button>
-              <button className="btn-newClient-header__clientPage mx-3 mb-0 ">
-                <img src={pdf} alt="pdf image" />
-                PDF
-              </button>
-              <div className="refreshIcon-header__clientPage">
-                <img
-                  src={refreshIcon}
-                  alt="refresh icon"
-                  onClick={() => getDetails()}
-                />
-              </div>
+              />
             </div>
           </div>
-
+        </div>
+        {jobWithClt?.length > 0 ? (
           <div
             className="detailsContainer__clientPage"
             style={{
@@ -186,6 +201,7 @@ function SpecificClient({ sprint }) {
                         let convertDate = moment
                           .utc(eachJob?.created_at)
                           .format("DD/MM/YY");
+                        console.log(eachJob);
                         return (
                           <tr key={index}>
                             <td>
@@ -327,10 +343,11 @@ function SpecificClient({ sprint }) {
               </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <Loader />
-      )}
+        ) : (
+          <Loader />
+        )}
+      </div>
+
       {editCltModal && (
         <EditClientModal
           showEditClientModal={showEditClientModal}

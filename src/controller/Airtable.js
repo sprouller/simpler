@@ -107,6 +107,9 @@ export async function fetchClients() {
       jobs: client.get("Jobs"),
       address: client.get("address"),
       description: client.get("description"),
+      month_time_allocation: client.get("month_time_allocation"),
+      retainer_add_job_date: client.get("retainer_add_job_date"),
+      ratiner_period: client.get("ratiner_period"),
     };
   });
 }
@@ -182,35 +185,64 @@ export async function fetchWorkItemsByJobId(jobId) {
       id: workItem.get("id"),
       dateOfWork: workItem.get("date_of_work"),
       hours: workItem.get("hours"),
+      remainTime: workItem.get("remainTime"),
       employee: {
         id: workItem.get("Employees (from sprint)")[0],
         firstName: workItem.get("first_name (from Employees) (from sprint)")[0],
         surname: workItem.get("surname (from Employees) (from sprint)")[0],
         colour: workItem.get("colour (from Employees) (from sprint)")[0],
+        jobId: jobId,
       },
     };
   });
 }
 
 export async function addNewClient(clientDetails) {
-  let { clientType, subClient, description, client, createdAt, compLogo } =
-    clientDetails;
-  console.log("Airtable", subClient);
+  let {
+    clientType,
+    subClient,
+    description,
+    client,
+    createdAt,
+    compLogo,
+    monthTimeAllocation,
+    date,
+    radioVal,
+  } = clientDetails;
+  console.log("Airtable subClient", subClient);
   try {
-    let returnedNewClient = await base(
-      process.env.REACT_APP_CLIENTS_TABLE_ID
-    ).create(
-      {
-        name: client,
-        client_since: createdAt,
-        subbrand: subClient,
-        client_type: clientType,
-        description: description,
-        // comp_logo: compLogo,
-      },
-      { typecast: true }
-    );
-    console.log("airTable compLogo", compLogo);
+    let returnedNewClient;
+    clientType !== "Retainer"
+      ? (returnedNewClient = await base(
+          process.env.REACT_APP_CLIENTS_TABLE_ID
+        ).create(
+          {
+            name: client,
+            client_since: createdAt,
+            subbrand: subClient,
+            client_type: clientType,
+            description: description,
+            // comp_logo: compLogo,
+          },
+          { typecast: true }
+        ))
+      : (returnedNewClient = await base(
+          process.env.REACT_APP_CLIENTS_TABLE_ID
+        ).create(
+          {
+            name: client,
+            client_since: createdAt,
+            subbrand: subClient,
+            client_type: clientType,
+            description: description,
+            month_time_allocation: monthTimeAllocation,
+            retainer_add_job_date: date,
+            ratiner_period: radioVal,
+            // comp_logo: compLogo,
+          },
+          { typecast: true }
+        ));
+
     let clientId = returnedNewClient.getId();
     console.log(`Client ${clientId} added to Airtable`);
     return clientId;
@@ -332,23 +364,52 @@ export async function addJobToAirtable(job) {
 }
 
 export async function editClientToAirtable(cltData, _id) {
-  let { clientType, subClient, description, client, createdAt, compLogo } =
-    cltData;
-
-  let cltDetails = {
-    id: _id,
-    fields: {
-      name: client,
-      client_since: createdAt,
-      subbrand: subClient,
-      client_type: clientType,
-      description: description,
-      // comp_logo: compLogo,
-    },
-  };
-  const cltTableId = process.env.REACT_APP_CLIENTS_TABLE_ID;
+  let {
+    clientType,
+    subClient,
+    description,
+    client,
+    createdAt,
+    monthTimeAllocation,
+    date,
+    radioVal,
+    compLogo,
+  } = cltData;
+  console.log("Airtable subClient edit", subClient, _id);
+  let cltDetails;
+  if (clientType !== "Retainer") {
+    cltDetails = {
+      id: _id,
+      fields: {
+        name: client,
+        client_since: createdAt,
+        subbrand: subClient,
+        client_type: clientType,
+        description: description,
+        // comp_logo: compLogo,
+      },
+    };
+  } else {
+    cltDetails = {
+      id: _id,
+      fields: {
+        name: client,
+        client_since: createdAt,
+        subbrand: subClient,
+        client_type: clientType,
+        description: description,
+        month_time_allocation: monthTimeAllocation,
+        retainer_add_job_date: date,
+        ratiner_period: radioVal,
+        // comp_logo: compLogo,
+      },
+    };
+  }
   try {
-    return await base(cltTableId).update(cltDetails.id, cltDetails.fields);
+    const cltTableId = process.env.REACT_APP_CLIENTS_TABLE_ID;
+    return await base(cltTableId).update(_id, cltDetails.fields, {
+      typecast: true,
+    });
   } catch (error) {
     console.log({ error });
   }
@@ -404,8 +465,14 @@ export const addSprintToExistingJobInTable = async (sprintData, jobId) => {
   }
 };
 
-export const addWorkItemToAirtable = async (sprintId, date, hours) => {
+export const addWorkItemToAirtable = async (
+  sprintId,
+  date,
+  hours,
+  remainTime
+) => {
   const workItemToAdd = {
+    remainTime,
     date_of_work: date,
     hours: hours,
     sprint: [sprintId],

@@ -6,7 +6,6 @@ import {
   fetchSprints,
 } from "../controller/Airtable";
 
-import ViewSprintModal from "./ViewSprintModal";
 import ViewJob from "./ViewJob";
 
 function SingleJob({ convertDate, eachJob, sprint }) {
