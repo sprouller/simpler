@@ -7,11 +7,11 @@ import AddResourceModal from "./AddResourceModal";
 import EmpProfile from "./EmpProfile";
 
 function CompProfile({ sprints, clients, cred, empData }) {
-  const [parseCred, setParseCred] = useState({});
+  // const [parseCred, setParseCred] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSpecificClt, setIsSpecificCltSet] = useState(false);
   const [specificClt, setSpecificClt] = useState({});
-  const [jobRelatedToEmp, setJobRelatedToEmp] = useState([]);
+  const [jobRelatedToEmp, setJobRelatedToEmp] = useState(empData);
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [showEmpProfile, setShowEmpProfile] = useState(false);
   const [empId, setEmpId] = useState("");
@@ -22,26 +22,27 @@ function CompProfile({ sprints, clients, cred, empData }) {
     // setIsLoaded(!isLoaded);
     isLoaded === true &&
       clients?.forEach((clt) => {
-        if (clt?.id === parseCred?.clientDetails[0]) {
-          setSpecificClt(clt);
-          setIsSpecificCltSet(true);
-        }
+        // if (clt?.id === parseCred?.clientDetails[0]) {
+        setSpecificClt(clt);
+        setIsSpecificCltSet(true);
+        // }
       });
   };
 
   const getEmpDetails = () => {
-    if (isSpecificClt === true) {
-      let filteredData = sprints.filter((data) => {
-        if (data?.job?.client?.id === specificClt?.id) {
-          return { jobData: data?.job?.id, empData: data?.employee };
-        }
-      });
-      setJobRelatedToEmp(filteredData);
-    }
+    // if (isSpecificClt === true) {
+    //   let filteredData = sprints.filter((data) => {
+    //     if (data?.job?.client?.id === specificClt?.id) {
+    //       return { jobData: data?.job?.id, empData: data?.employee };
+    //     }
+    //   });
+    //   setJobRelatedToEmp(filteredData);
+    // }
+    // setJobRelatedToEmp(empData);
   };
 
   useEffect(() => {
-    setParseCred(JSON?.parse(cred));
+    // setParseCred(JSON?.parse(cred));
     setIsLoaded(true);
   }, []);
 
@@ -54,7 +55,7 @@ function CompProfile({ sprints, clients, cred, empData }) {
   }, [isSpecificClt]);
 
   const handleEmpClick = (data) => {
-    setEmpId(data?.employee?.id);
+    setEmpId(data?.id);
     setShowEmpProfile(!showEmpProfile);
   };
 
@@ -68,25 +69,25 @@ function CompProfile({ sprints, clients, cred, empData }) {
         <div className="header__clientPage header__compProfile">
           <div className="d-flex" style={{ alignItems: "center" }}>
             <Link to="/signin" style={{ width: "fit-content" }}>
-              {Object.keys(parseCred)?.length > 0 && (
+              {/* {Object.keys(parseCred)?.length > 0 && (
                 <div className="userDetails__sideBar">
                   <p>{parseCred?.email?.slice(0, 1)}</p>
                 </div>
-              )}
+              )} */}
             </Link>
-            <p className="header__clientPageTitle">{specificClt?.name}</p>
+            {/* <p className="header__clientPageTitle">{specificClt?.name}</p> */}
           </div>
           <div className="d-flex">
-            <button
+            {/* <button
               className="button__signIn btn-newClient-header__clientPage signOutBtn__compProfile"
               onClick={() => {
-                localStorage.setItem("userCred", "");
+                // localStorage.setItem("userCred", "");
                 // window.location.reload();
                 navigate(0);
               }}
             >
               Sign out
-            </button>
+            </button> */}
             <div className="refreshIcon-header__clientPage">
               <img
                 src={refreshIcon}
@@ -136,35 +137,36 @@ function CompProfile({ sprints, clients, cred, empData }) {
                   </button>
                 </div>
                 <div className="d-flex empCont__CompProfile">
-                  {jobRelatedToEmp?.map((data) => {
-                    return (
-                      <div
-                        className="emp-empCont__CompProfile"
-                        onClick={() => handleEmpClick(data)}
-                        key={data?.id}
-                      >
-                        <img
-                          src={empSvg}
-                          alt="empImage"
-                          style={{
-                            backgroundColor: `${data?.employee?.colour}80`,
-                          }}
-                        />
-                        <div className="details-emp-empCont__CompProfile">
-                          <p style={{ fontWeight: "600" }}>
-                            {data?.employee?.firstName?.length > 0
-                              ? data?.employee?.firstName
+                  <table className="table__specificClient">
+                    <tr>
+                      <th>Employee</th>
+                      <th>Title</th>
+                      <th>Date</th>
+                    </tr>
+                    {empData?.map((data) => {
+                      return (
+                        <tr
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleEmpClick(data)}
+                          key={data?.id}
+                        >
+                          <td>
+                            {data?.firstName?.length > 0
+                              ? data?.firstName
                               : "- - -"}
-                          </p>
-                          <p>
-                            {data?.job?.name?.length
-                              ? data?.job?.name
-                              : "Job name"}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                          </td>
+                          <td>
+                            {data?.title?.length > 0 ? data?.title : "- - -"}
+                          </td>
+                          <td>
+                            {data?.startedDate?.length > 0
+                              ? data?.startedDate
+                              : "- - -"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </table>
                 </div>
               </div>
               <div
@@ -184,7 +186,7 @@ function CompProfile({ sprints, clients, cred, empData }) {
                   </button>
                 </div>
                 <div className="d-flex">
-                  {specificClt?.address ? (
+                  {/* {specificClt?.address ? (
                     <p
                       style={{
                         fontSize: "12px",
@@ -202,8 +204,8 @@ function CompProfile({ sprints, clients, cred, empData }) {
                     >
                       Address not available
                     </p>
-                  )}
-                  {parseCred?.email ? (
+                  )} */}
+                  {/* {parseCred?.email ? (
                     <p
                       style={{
                         fontSize: "12px",
@@ -223,7 +225,7 @@ function CompProfile({ sprints, clients, cred, empData }) {
                     >
                       email not available
                     </p>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>

@@ -215,7 +215,6 @@ function AddEventModal({
                       {clientId &&
                         clients?.map((clientData, index) => {
                           if (clientData.id === clientId) {
-                            console.log("cltData", clientData);
                             if (clientData?.subbrand?.length > 0) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {
@@ -435,7 +434,6 @@ function AddEventModal({
                       {clientId &&
                         clients?.map((clientData, index) => {
                           if (clientData.id === clientId) {
-                            console.log("cltData", clientData);
                             if (clientData?.subbrand?.length > 0) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {

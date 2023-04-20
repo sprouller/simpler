@@ -4,7 +4,8 @@ import closeIcon from "../images/closeIcon.svg";
 import {
   addWorkItemToAirtable,
   deleteWorkItemFromTable,
-  fetchSprints,
+  editClient,
+  editJobInTable,
   fetchWorkItemsByJobId,
 } from "../controller/Airtable";
 import plusIconWhite from "../images/plusIconWhite.svg";
@@ -13,7 +14,14 @@ import moment from "moment-timezone";
 import CloseButton from "react-bootstrap/CloseButton";
 import "react-circular-progressbar/dist/styles.css";
 
-function ViewJob({ setIsJobOpen, isJobModalOpen, job, sprint, employee }) {
+function ViewJob({
+  setIsJobOpen,
+  isJobModalOpen,
+  job,
+  sprint,
+  handleRemainTimeChange,
+  fetchJobDetails,
+}) {
   const [fltSprint, setFltSprint] = useState(null);
   const [isLiveJob, setIsLiveJob] = useState(true);
   const [activeBtn, setActiveBtn] = useState(false);
@@ -21,6 +29,8 @@ function ViewJob({ setIsJobOpen, isJobModalOpen, job, sprint, employee }) {
   const [date, setDate] = useState();
   const [hours, setHours] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [remainTime, setRemainTime] = useState(0);
+  console.log("timeRe", remainTime);
   const filterEmp = async () => {
     let dataArr = [];
     await sprint.map((data) => {
@@ -43,22 +53,49 @@ function ViewJob({ setIsJobOpen, isJobModalOpen, job, sprint, employee }) {
 
   const handleAddWorkItem = async (sprintId, date, hours) => {
     try {
-      await addWorkItemToAirtable(sprintId, date, hours);
+      await addWorkItemToAirtable(sprintId, date, hours, remainTime);
       const workItems = await fetchWorkItemsByJobId(fltSprint.job.id);
       setworkItems(workItems);
-
       setHours(0); // not working
+      setRemainTime(
+        parseInt(fltSprint?.job?.timeAllocated) -
+          parseInt(
+            workItems.reduce((acc, val) => {
+              return acc + val.hours;
+            }, 0)
+          )
+      );
     } catch (error) {
       console.log({ error });
     }
   };
 
   const handleDeleteWorkItem = async (workItemId) => {
+    await addWorkItemToAirtable(fltSprint?.id, date, hours, remainTime);
     await deleteWorkItemFromTable(workItemId);
     fetchWorkItemsByJobId(fltSprint.job.id).then((workItems) => {
       setworkItems(workItems);
     });
+    setRemainTime(
+      parseInt(fltSprint?.job?.timeAllocated) -
+        parseInt(
+          workItems.reduce((acc, val) => {
+            return acc + val.hours;
+          }, 0)
+        )
+    );
   };
+  const clientData = {
+    jobId: fltSprint?.job?.id,
+    remainTime: parseInt(remainTime),
+    clientId: fltSprint?.job?.client?.id,
+  };
+
+  async function updateJob() {
+    clientData?.clientId?.length > 0 &&
+      (await editJobInTable(clientData).then((res) => console.log(res)));
+    // handleRemainTimeChange();
+  }
 
   useEffect(() => {
     setTimeout(() => {
@@ -66,10 +103,22 @@ function ViewJob({ setIsJobOpen, isJobModalOpen, job, sprint, employee }) {
       todaysDate();
       fetchWorkItemsByJobId(fltSprint?.job?.id).then((workItems) => {
         setworkItems(workItems);
+        setRemainTime(
+          parseInt(fltSprint?.job?.timeAllocated) -
+            parseInt(
+              workItems.reduce((acc, val) => {
+                return acc + val.hours;
+              }, 0)
+            )
+        );
       });
     }, 200);
   }, [activeBtn === true]);
 
+  // useEffect(() => {
+
+  // }, [remainTime]);
+  console.log("fltSprint", fltSprint, remainTime);
   return (
     <>
       {loaded && (
@@ -82,6 +131,8 @@ function ViewJob({ setIsJobOpen, isJobModalOpen, job, sprint, employee }) {
               className="closeIconBtn"
               onClick={() => {
                 setIsJobOpen(!isJobModalOpen);
+                updateJob();
+                fetchJobDetails();
               }}
             >
               <img src={closeIcon} alt="close icon" />
@@ -281,6 +332,7 @@ function ViewJob({ setIsJobOpen, isJobModalOpen, job, sprint, employee }) {
                           )}
                           maxValue={fltSprint?.job?.timeAllocated}
                           strokeWidth={18}
+                          className="viewJob"
                         />
                       </div>
                     </Col>
@@ -295,6 +347,11 @@ function ViewJob({ setIsJobOpen, isJobModalOpen, job, sprint, employee }) {
                             className="mb-2"
                             direction="horizontal"
                             gap={4}
+                            style={
+                              workItem?.hours === 0
+                                ? { display: "none" }
+                                : { display: "flex" }
+                            }
                           >
                             <strong>{workItem?.employee?.firstName}: </strong>
                             <p>{getUTCDate(workItem?.dateOfWork)}</p>

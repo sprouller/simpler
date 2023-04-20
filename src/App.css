@@ -736,7 +736,7 @@ body {
 /* specific client page */
 .tableCont__specificClient {
   height: 85%;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin: 10px 0px 10px;
 }
 .tableCont__specificClient::-webkit-scrollbar {
@@ -744,12 +744,15 @@ body {
   background-color: #ededed;
   border-radius: 10px;
 }
+.retainer-scrollView {
+  overflow: auto;
+}
 
 .table__specificClient {
   width: 99%;
   border-collapse: separate;
   border-spacing: 0 8px;
-  overflow-y: scroll;
+  overflow-y: hidden;
 }
 
 .table__specificClient tr > td:first-child {
@@ -1032,16 +1035,14 @@ th {
   background-image: none;
 }
 .loader {
-  /* width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--grey-border); */
   height: 100%;
   display: flex !important;
   align-items: center;
   justify-content: center;
+}
+.loaderInClient {
+  height: 100vh;
+  width: 100%;
 }
 
 .edit-client__clientPage {
@@ -1134,8 +1135,7 @@ th {
   border-radius: 50%;
   margin: 5px auto;
 }
-.progressBar {
-}
+
 .progressBar circle {
   width: 100%;
   height: 100%;
@@ -1143,21 +1143,127 @@ th {
   stroke-width: 30px;
   stroke-dasharray: 440;
 }
-.CircularProgressbar {
+.viewJob {
   position: absolute;
   border: none;
   top: -30px;
   left: -30px;
   width: inherit !important;
 }
-.CircularProgressbar .CircularProgressbar-path {
+.viewJob > .CircularProgressbar-path {
   stroke: #20e29f !important;
 }
-.CircularProgressbar .CircularProgressbar-trail {
+.viewJob > .CircularProgressbar-trail {
   stroke: #fff !important;
 }
 .jobList-singleRow {
   cursor: pointer;
+}
+
+.retainer-progressBar {
+  width: 167px !important;
+  overflow: initial;
+  height: 176px;
+  margin-top: 20px;
+}
+.retainer-progressBar > .CircularProgressbar-path {
+  stroke: #20e29f !important;
+}
+.retainer-progressBar > .CircularProgressbar-path {
+  stroke-width: 20px;
+}
+.retainer-progressBar > .CircularProgressbar-trail {
+  stroke: #000 !important;
+  stroke-width: 20px;
+  position: initial !important;
+}
+
+.retainerTrackerCont {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.monthTracking {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 30px;
+  overflow-y: auto;
+  /* max-height: 170px;
+  width: 58%; */
+  max-height: 170px;
+  min-width: 220px;
+  width: 63%;
+}
+.timeCont-monthTracking {
+  display: flex;
+  border-bottom: 1px solid #000;
+  justify-content: space-between;
+}
+.month-monthTracking {
+  font-size: 16px !important;
+  line-height: 15px;
+  margin-bottom: 15px;
+  min-width: 180px;
+  margin-top: 10px;
+}
+.timeCont-monthTracking > p {
+  font-size: 12px;
+  padding-bottom: 7px;
+  line-height: 10px;
+  display: flex;
+  align-items: center;
+}
+.timeCont-monthTracking > p:first-child {
+  margin-right: 10px;
+}
+.timeCont-monthTracking > p:first-child > span,
+.timeCont-monthTracking > p:last-child > span {
+  border-radius: 15px;
+  padding: 4px 6px;
+  white-space: pre;
+  margin-left: 4px;
+}
+.timeCont-monthTracking > p:first-child > span {
+  background: #20e29f;
+  color: #fff;
+}
+.timeCont-monthTracking > p:last-child > span {
+  background: #000;
+  color: #fff;
+}
+.timeFilter-cont {
+  position: absolute;
+  top: 61px;
+  left: 34px;
+}
+.timeFilter-cont > select {
+  border: none;
+  outline: none;
+  border-bottom: 1px solid #ededed;
+  border-top: 1px solid #ededed;
+  width: 100%;
+  margin: 4px 0px;
+  font-size: 13px;
+}
+.timeFilter-cont-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.timeFilter-cont-inner-title {
+  font-size: 15px !important;
+  margin: 0px;
+  line-height: 10px;
+  letter-spacing: -0.5px;
+}
+.timeFilter-cont-inner-val {
+  color: #20e29f;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 10px !important;
+  margin-top: 4px;
 }
 /* media query  */
 

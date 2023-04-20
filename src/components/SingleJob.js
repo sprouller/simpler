@@ -8,16 +8,27 @@ import {
 
 import ViewJob from "./ViewJob";
 
-function SingleJob({ convertDate, eachJob, sprint }) {
+function SingleJob({
+  convertDate,
+  eachJob,
+  sprint,
+  remainTime,
+  fetchJobDetails,
+}) {
   const [isJobModalOpen, setIsJobOpen] = useState(false);
   const [job, setJob] = useState(null);
   const [employee, setEmployee] = useState([]);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const [remainTimeChange, setRemainTimeChange] = useState(false);
+
   useEffect(() => {
     fetchEmployees()
       .then((res) => setEmployee(employee))
       .catch((e) => console.log(e));
-  }, []);
+  }, [remainTime]);
+
+  const handleRemainTimeChange = () => {
+    setRemainTimeChange(!remainTimeChange);
+  };
 
   return (
     <>
@@ -31,7 +42,7 @@ function SingleJob({ convertDate, eachJob, sprint }) {
         <td>{eachJob?.job_code?.length > 0 ? eachJob?.job_code : "- - -"}</td>
         <td>{eachJob?.job_name?.length > 0 ? eachJob?.job_name : "- - -"}</td>
         <td>{convertDate?.length > 0 ? convertDate : "DD/MM/YY"}</td>
-        <td>{"---"}</td>
+        <td>{eachJob?.remainTime ? eachJob?.remainTime : "- - -"}</td>
         <td>{eachJob?.time_allocated ? eachJob?.time_allocated : "- - -"}</td>
       </tr>
       {isJobModalOpen && (
@@ -41,6 +52,8 @@ function SingleJob({ convertDate, eachJob, sprint }) {
           job={job}
           sprint={sprint}
           employee={employee}
+          handleRemainTimeChange={handleRemainTimeChange}
+          fetchJobDetails={fetchJobDetails}
         />
       )}
     </>

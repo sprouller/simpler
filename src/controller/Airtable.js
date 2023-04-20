@@ -110,6 +110,7 @@ export async function fetchClients() {
       month_time_allocation: client.get("month_time_allocation"),
       retainer_add_job_date: client.get("retainer_add_job_date"),
       ratiner_period: client.get("ratiner_period"),
+      remainingTime: client.get("remainingTime"),
     };
   });
 }
@@ -151,6 +152,7 @@ export async function fetchJobs() {
       Third_party_cost: job.get("Third_party_cost")
         ? job.get("Third_party_cost")
         : "",
+      remainTime: job.get("remainTime") ? job.get("remainTime") : "",
     };
   });
 }
@@ -465,14 +467,8 @@ export const addSprintToExistingJobInTable = async (sprintData, jobId) => {
   }
 };
 
-export const addWorkItemToAirtable = async (
-  sprintId,
-  date,
-  hours,
-  remainTime
-) => {
+export const addWorkItemToAirtable = async (sprintId, date, hours) => {
   const workItemToAdd = {
-    remainTime,
     date_of_work: date,
     hours: hours,
     sprint: [sprintId],
@@ -518,7 +514,9 @@ export const editJobInTable = async (jobData) => {
     subBrand,
     thirdPartyItem,
     thirdPartyCost,
+    remainTime,
   } = jobData;
+  console.log("jobId airtbale", jobId, remainTime);
   let job = {
     id: jobId,
     fields: {
@@ -531,19 +529,28 @@ export const editJobInTable = async (jobData) => {
       subBrand,
       Third_party_item: thirdPartyItem,
       Third_party_cost: thirdPartyCost,
+      remainTime: remainTime,
     },
   };
+
   const jobsTableId = process.env.REACT_APP_JOBS_TABLE_ID;
   try {
-    return await base(jobsTableId).update(job.id, job.fields);
+    return await base(jobsTableId).update(jobId, job.fields);
   } catch (error) {
     console.log({ error });
   }
 };
 
 export const editClient = async (cltData, _id) => {
-  let { clientType, subClient, description, client, createdAt, compLogo } =
-    cltData;
+  let {
+    clientType,
+    subClient,
+    description,
+    client,
+    createdAt,
+    compLogo,
+    remainingTime,
+  } = cltData;
 
   const cltDetails = {
     id: _id,
@@ -553,6 +560,7 @@ export const editClient = async (cltData, _id) => {
       subbrand: subClient,
       client_type: clientType,
       description: description,
+      remainingTime: remainingTime,
       // comp_logo :compLogo
     },
   };

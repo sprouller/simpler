@@ -135,7 +135,7 @@ function EditClientModal({ showEditClientModal, editCltModal, clt }) {
                   <div
                     className="fieldBtnCont__CNC"
                     onClick={() => {
-                      subClient.length > 0 &&
+                      subClient?.length > 0 &&
                         setSubClientArr([...subClientArr, subClient]);
                       setSubClient("");
                     }}
@@ -143,7 +143,7 @@ function EditClientModal({ showEditClientModal, editCltModal, clt }) {
                     <img src={plusIconWhite} alt="plus icon" />
                   </div>
                   <div className="listOutClient__CNC">
-                    {subClientArr.length > 0 &&
+                    {subClientArr?.length > 0 &&
                       subClientArr?.map((eachClient, index) => {
                         return (
                           <div className="client_CNC" key={index}>

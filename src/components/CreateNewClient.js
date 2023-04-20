@@ -75,7 +75,6 @@ function CreateNewClient({ show, setShow, jobs }) {
                 };
 
                 let cltId = addNewClient(clientDetails);
-                console.log(cltId);
               }
 
               setCompLogo({});

@@ -13,17 +13,17 @@ import mobileLogo from "../images/holla-mobile-logo.svg";
 const Navbar = ({ userDetails }) => {
   const [hover, setHover] = useState(false);
   const location = useLocation();
-  const [cred, setCred] = useState("");
+  // const [cred, setCred] = useState("");
 
-  const handleCredDetails = () => {
-    let data = localStorage?.getItem("userCred");
-    if (data) {
-      setCred(data);
-    }
-  };
-  useEffect(() => {
-    handleCredDetails();
-  }, [userDetails]);
+  // const handleCredDetails = () => {
+  //   let data = localStorage?.getItem("userCred");
+  //   if (data) {
+  //     setCred(data);
+  //   }
+  // };
+  // useEffect(() => {
+  //   handleCredDetails();
+  // }, [userDetails]);
 
   return (
     <nav
@@ -108,17 +108,13 @@ const Navbar = ({ userDetails }) => {
         </div>
         <div className="userDetailsCont__sideBar">
           <Link to="/signin" style={{ width: "fit-content" }}>
-            {cred?.length > 0 ? (
+            {/* {cred?.length > 0 ? (
               <div className="userDetails__sideBar">
                 <p>{JSON.parse(cred)?.email?.slice(0, 1)}</p>
               </div>
-            ) : (
-              <img
-                className="loginSvgIcon"
-                src={loginSvg}
-                alt="login svg icon"
-              />
-            )}
+            ) : ( */}
+            <img className="loginSvgIcon" src={loginSvg} alt="login svg icon" />
+            {/* )} */}
           </Link>
         </div>
       </div>

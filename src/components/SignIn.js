@@ -15,39 +15,39 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
   const [success, setSuccess] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
-  const [cred, setCred] = useState([]);
+  // const [cred, setCred] = useState([]);
   const [client, setAllClt] = useState(null);
-  const [currUser, setCurrUser] = useState("");
+  // const [currUser, setCurrUser] = useState("");
   const [sprints, setSprints] = useState([]);
   const [empData, setEmpData] = useState([]);
   const navigate = useNavigate();
 
-  const handleSignIn = (e) => {
-    e.preventDefault();
-    if (email && pass) {
-      cred.forEach((data) => {
-        if (data.email === email && data.password === pass) {
-          localStorage.setItem(
-            "userCred",
-            JSON.stringify({
-              email: email,
-              pass: pass,
-              type: data?.type,
-              clientDetails: data?.clientDetails,
-            })
-          );
-          setEmail("");
-          setPass("");
-          setSuccess("");
-          setUserDetails(true);
-          setSuccess("Valid credentials");
-          window.location.reload();
-        } else {
-          setError("Enter valid credentials");
-        }
-      });
-    }
-  };
+  // const handleSignIn = (e) => {
+  //   e.preventDefault();
+  //   if (email && pass) {
+  //     cred.forEach((data) => {
+  //       if (data.email === email && data.password === pass) {
+  //         localStorage.setItem(
+  //           "userCred",
+  //           JSON.stringify({
+  //             email: email,
+  //             pass: pass,
+  //             type: data?.type,
+  //             clientDetails: data?.clientDetails,
+  //           })
+  //         );
+  //         setEmail("");
+  //         setPass("");
+  //         setSuccess("");
+  //         setUserDetails(true);
+  //         setSuccess("Valid credentials");
+  //         window.location.reload();
+  //       } else {
+  //         setError("Enter valid credentials");
+  //       }
+  //     });
+  //   }
+  // };
 
   // const handleLogOut = () => {
   //   localStorage.setItem("userCred", "");
@@ -59,15 +59,15 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
   // };
 
   useEffect(() => {
-    setCurrUser(localStorage.getItem("userCred"));
+    // setCurrUser(localStorage.getItem("userCred"));
     fetchSprints()
       .then((data) => setSprints(data))
       .catch((e) => console.log(e));
-    fetchCred()
-      .then((eachCred) => {
-        setCred(eachCred);
-      })
-      .catch((e) => console.log("cred not available"));
+    // fetchCred()
+    //   .then((eachCred) => {
+    //     setCred(eachCred);
+    //   })
+    //   .catch((e) => console.log("cred not available"));
 
     fetchEmployees()
       .then((eachCred) => {
@@ -83,23 +83,24 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
 
   return (
     <div className="my-calendar signIn">
-      {currUser?.length > 0 ? (
-        <>
-          {sprints?.length > 0 && client ? (
-            <CompProfile
-              sprints={sprints}
-              userDetails={userDetails}
-              // handleLogOut={handleLogOut}
-              clients={client}
-              cred={currUser}
-              empData={empData}
-            />
-          ) : (
-            <Loader />
-          )}
-        </>
-      ) : (
-        <form>
+      {/* {currUser?.length > 0 ? ( */}
+      <>
+        {/* {sprints?.length > 0 && client ? (
+        
+           ) : (
+             <Loader />
+           )} */}
+        <CompProfile
+          sprints={sprints}
+          userDetails={userDetails}
+          // handleLogOut={handleLogOut}
+          clients={client}
+          // cred={currUser}
+          empData={empData}
+        />
+      </>
+      {/* ) : ( */}
+      {/* <form>
           {success?.length > 0 ? (
             <p className="success-message__signIn">{success}</p>
           ) : (
@@ -124,12 +125,12 @@ const SignIn = ({ setUserDetails, userDetails, allClt }) => {
           <button
             type="submit"
             className="button__signIn btn-newClient-header__clientPage"
-            onClick={(e) => handleSignIn(e)}
+            // onClick={(e) => handleSignIn(e)}
           >
             Sign in
           </button>
         </form>
-      )}
+      )} */}
     </div>
   );
 };

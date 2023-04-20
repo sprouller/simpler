@@ -176,7 +176,6 @@ function EditModal({
             onClick={() => {
               let parsedStartDate = ParseStartDate(start);
               let parsedEndDate = ParseEndDate(end);
-              console.log("Pares", parsedEndDate, parsedStartDate);
               // console.log("Dated", parsedEndDate, parsedStartDate);
               const sprintData = {
                 sprintId: sprint.id,
@@ -246,7 +245,6 @@ function EditModal({
                       {clientId &&
                         clients?.map((clientData, index) => {
                           if (clientData.id === clientId) {
-                            console.log("cltData", clientData);
                             if (clientData?.subbrand?.length > 0) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {
@@ -467,7 +465,6 @@ function EditModal({
                       {clientId &&
                         clients?.map((clientData, index) => {
                           if (clientData.id === clientId) {
-                            console.log("cltData", clientData);
                             if (clientData?.subbrand?.length > 0) {
                               return clientData?.subbrand?.map(
                                 (subData, index) => {

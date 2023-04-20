@@ -8,9 +8,9 @@ import SideNavBar from "./components/SideNavBar";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import ClientPage from "./components/ClientPage";
 import SpecificClient from "./components/SpecificClient";
-//import SignIn from "./components/SignIn";
-//import { useEffect } from "react";
-//import { fetchJobs, fetchSprints } from "./controller/Airtable";
+import SignIn from "./components/SignIn";
+import { useEffect } from "react";
+import { fetchJobs, fetchSprints } from "./controller/Airtable";
 import { createHashHistory } from "history";
 
 function App() {
@@ -37,7 +37,7 @@ function App() {
   };
 
   const [userDetails, setUserDetails] = useState(false);
-  //const [cred, setCred] = useState("");
+  // const [cred, setCred] = useState("");
   const [allJobs, setAllJobs] = useState([]);
   const [sprint, setSprint] = useState([]);
 
@@ -46,7 +46,7 @@ function App() {
     hashType: "noslash",
   });
 
-  /*const fetchAllJobs = () => {
+  const fetchAllJobs = () => {
     fetchJobs()
       .then((jobs) => {
         setAllJobs(jobs);
@@ -56,25 +56,67 @@ function App() {
       .then((res) => setSprint(res))
       .catch((e) => console.log(e));
   };
-  */
+
+  useEffect(() => {
+    // const pastCred = localStorage.getItem("userCred");
+    // if (pastCred?.length > 0) {
+    //   setCred(pastCred);
+    // } else {
+    //   const newCred = localStorage.setItem("userCred", "");
+    //   setCred(newCred);
+    // }
+    fetchAllJobs();
+  }, []);
 
   return (
     <HashRouter history={history}>
       <div className="app" style={myStyle}>
         <SideNavBar userDetails={userDetails} />
-          <Routes>
+        {/* {cred?.length === 0 || cred === undefined ? ( */}
+        {/* <Routes>
             <Route
-              path="/"
-              element={<MyCalendar className="p-4" style={myStyle} />}
-            />
-
-            <Route path="/client" element={<ClientPage />} />
-
-            <Route
-              path="/client/:id"
-              element={<SpecificClient sprint={sprint} allJobs={allJobs} />}
+              path="*"
+              element={
+                <SignIn
+                  setUserDetails={setUserDetails}
+                  userDetails={userDetails}
+                />
+              }
             />
           </Routes>
+        ) : ( */}
+        <Routes>
+          <Route
+            path="/"
+            element={<MyCalendar className="p-4" style={myStyle} />}
+          />
+
+          <Route path="/client" element={<ClientPage />} />
+
+          <Route
+            path="/client/:id"
+            element={<SpecificClient sprint={sprint} allJobs={allJobs} />}
+          />
+          <Route
+            path="/signin"
+            element={
+              <SignIn
+                setUserDetails={setUserDetails}
+                userDetails={userDetails}
+              />
+            }
+          />
+          <Route
+            path="/*"
+            element={
+              <SignIn
+                setUserDetails={setUserDetails}
+                userDetails={userDetails}
+              />
+            }
+          />
+        </Routes>
+        {/* )} */}
       </div>
     </HashRouter>
   );

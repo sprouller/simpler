@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import {
   addWorkItemToAirtable,
   deleteWorkItemFromTable,
+  editJobInTable,
   fetchWorkItemsByJobId,
 } from "../controller/Airtable";
 import closeIcon from "../images/closeIcon.svg";
@@ -35,7 +36,7 @@ function ViewSprintModal({
   const [workItems, setworkItems] = useState([]);
   const [isLiveJob, setIsLiveJob] = useState(true);
   const [activeBtn, setActiveBtn] = useState(false);
-
+  const [remainTime, setRemainTime] = useState(0);
   const todaysDate = () => {
     let date = new Date();
     let todayDate = moment(date).format("YYYY-MM-DD");
@@ -52,7 +53,6 @@ function ViewSprintModal({
       setworkItems(workItems);
     });
   }, [sprint]);
-  console.log("work", workItems);
 
   const getUTCDate = (date) => {
     return moment.utc(date).format("DD/MM/YYYY");
@@ -67,27 +67,62 @@ function ViewSprintModal({
     );
   }
   const handleAddWorkItem = async (sprintId, date, hours) => {
-    console.log("handleAddWorkItem");
-    console.log({ sprintId, date, hours });
     try {
-      console.log("dat", date);
       await addWorkItemToAirtable(sprintId, date, hours);
       const workItems = await fetchWorkItemsByJobId(sprint.job.id);
       setworkItems(workItems);
-      setHours(0); // not working
+      setHours(0);
+      setRemainTime(
+        parseInt(sprint?.job?.timeAllocated) -
+          parseInt(
+            workItems.reduce((acc, val) => {
+              return acc + val.hours;
+            }, 0)
+          )
+      );
     } catch (error) {
       console.log({ error });
     }
   };
 
   const handleDeleteWorkItem = async (workItemId) => {
-    console.log("handleDeleteWorkItem");
-    console.log({ workItemId });
     await deleteWorkItemFromTable(workItemId);
     fetchWorkItemsByJobId(sprint.job.id).then((workItems) => {
       setworkItems(workItems);
     });
+    setRemainTime(
+      parseInt(sprint?.job?.timeAllocated) -
+        parseInt(
+          workItems.reduce((acc, val) => {
+            return acc + val.hours;
+          }, 0)
+        )
+    );
   };
+
+  // useEffect(() => {
+  //   activeBtn === true &&
+  //     setRemainTime(
+  //       parseInt(sprint?.job?.timeAllocated) -
+  //         parseInt(
+  //           workItems.reduce((acc, val) => {
+  //             return acc + val.hours;
+  //           }, 0)
+  //         )
+  //     );
+  // }, []);
+
+  const clientData = {
+    jobId: sprint?.job?.id,
+    remainTime: parseInt(remainTime),
+    clientId: sprint?.job?.client?.id,
+  };
+
+  async function updateJob() {
+    clientData?.clientId?.length > 0 &&
+      (await editJobInTable(clientData).then((res) => console.log(res)));
+    // handleRemainTimeChange();
+  }
 
   return (
     <>
@@ -120,6 +155,15 @@ function ViewSprintModal({
               className="closeIconBtn"
               onClick={() => {
                 handleClose();
+                setRemainTime(
+                  parseInt(sprint?.job?.timeAllocated) -
+                    parseInt(
+                      workItems.reduce((acc, val) => {
+                        return acc + val.hours;
+                      }, 0)
+                    )
+                );
+                updateJob();
               }}
             >
               <img src={closeIcon} alt="close icon" />
@@ -334,6 +378,7 @@ function ViewSprintModal({
                         )}
                         maxValue={sprint?.job?.timeAllocated}
                         strokeWidth={18}
+                        className="viewJob"
                       />
                     </div>
                   </Col>

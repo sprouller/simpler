@@ -39,12 +39,8 @@ function AddResourceModal({
       color,
     };
     if (viewedEmp && Object?.keys(viewedEmp)?.length > 0) {
-      console.log("inEdit");
-
       addNewEmployee(resourceData, null, viewedEmp?.id);
     } else {
-      console.log("in new create mode");
-
       activeBtn
         ? addNewEmployee(utilityData, activeBtn)
         : addNewEmployee(resourceData, activeBtn);
